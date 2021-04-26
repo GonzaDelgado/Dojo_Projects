@@ -39,7 +39,9 @@
                 </div>
             </div>
             <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'tabla con dojox/grid'">
-                <div id="tablaGrid"></div>
+                <div class="grid">
+                    <div id="tablaGrid"></div>
+                </div>
             </div>
             <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'tabla con html'">
                 <div>
@@ -81,8 +83,6 @@
                 domStyle, fx) {
 
             let botonRefresh = dom.byId("botonRefresh");
-            let tablaGrid = dom.byId("tablaGrid");
-            let tablaHtml = dom.byId("tablaHtml");
             let pokeArray = [];
 
             function setOptions() {
