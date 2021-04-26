@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Call Center</title>
+    <link rel="stylesheet" href="../../demo.css" media="screen">
+    <link rel="stylesheet" href="../../style.css" media="screen">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/claro/claro.css"
+        media="screen">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/resources/dojo.css">
+    <link rel="stylesheet"
+        href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/claro/EnhancedGrid.css">
+    <link rel="stylesheet"
+        href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/EnhancedGrid_rtl.css">
+    <!-- load dojo and provide config via data attribute -->
+    <script src="../../dojo/dojo.js" data-dojo-config="async: 1, parseOnLoad: 1"></script>
+    <style type="text/css">
+        /*Grid need a explicit width/height by default*/
+
+        #grid {
+            width: 51em;
+            height: 450px;
+        }
+    </style>
+</head>
+
+<body class="claro">
+    <div id="appLayout" class="demoLayout" data-dojo-type="dijit/layout/BorderContainer"
+        data-dojo-props="design: 'headline'">
+        <div class="centerPanel" data-dojo-type="dijit/layout/TabContainer"
+            data-dojo-props="region: 'center', tabPosition: 'top'">
+            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'Buscador'">
+                <h4>Consultar Reclamo</h4>
+                <br>
+                <div>
+                    <!-- Aca va input que solo permita numeros -->
+                    
+
+                    <button id="btnbuscar">Buscar</button>
+                </div>
+                <br>
+                <div class="grid">
+                    <div id="tablaGrid" style="visibility: hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="edgePanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">
+            <img src="https://www.hsbc.com.ar/content/dam/hsbc/hbar/images/index/HSBC_MASTERBRAND_LOGO_RGB.svg" alt="HSBC logo"
+                WIDTH="160" HEIGHT="70">
+        </div>
+        <div id="leftCol" class="edgePanel" data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region: 'left', splitter: true">Panel izquierdo</div>
+    </div>
+    
+    </script>
+    
+    <script>
+        require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
+            "dojo/on", "dojo/request", "dojo/dom-construct", "dojo/dom-attr",
+            "dojox/grid/enhanced/plugins/Pagination", 'dojo/domReady!'],
+
+            function (EnhancedGrid, ItemFileWriteStore, dom, on, request, domConstruct, domAttr,
+                Pagination) {
+
+                const url = "https://60870b4fa3b9c200173b7792.mockapi.io/Reclamos";
+                let botonBuscar = dom.byId("btnbuscar");
+                let registros = [];
+
+                /*set up layout*/
+                let layout = [
+                    [{
+                        'name': 'Código',
+                        'field': 'Codigo'
+                    }, {
+                        'name': 'Fecha',
+                        'field': 'Fecha'
+                    }, {
+                        'name': 'Estado',
+                        'field': 'Estado'
+                    }, {
+                        'name': 'Nombre',
+                        'field': 'Nombre'
+                    }, {
+                        'name': 'Tipo',
+                        'field': 'Tipo',
+
+                    }, {
+                        'name': 'Descripción',
+                        'field': 'Descripcion',
+                    }, {
+                        'name': 'Email',
+                        'field': 'Email',
+                    }]
+                ];
+                /*set up data store*/
+                var data = {
+                    identifier: 'id',
+                    items: registros,
+                };
+                let store = new ItemFileWriteStore({ data: data });
+                /*create a new grid:*/
+                var grid = new EnhancedGrid({
+                    id: 'grid',
+                    store: store,
+                    plugins: {
+                        pagination: {
+                            position: "bottom",
+                            sizeSwitch: false,
+                            gotoButton: true,
+                            defaultPageSize: 5,
+                        },
+                    },
+                    editable: true,
+                    structure: layout,
+                    rowSelector: '20px'
+                },
+                    document.createElement('div'));
+                
+                /*append the new grid to the div*/
+                dom.byId("tablaGrid").appendChild(grid.domNode);
+
+                /*Call startup() to render the grid*/
+                grid.startup();
+
+                function searchReclamo() {
+                    var codigoReclamo = dom.byId("codigoReclamo").value;
+                    request.get(url + codigoReclamo, {
+                        handleAs: "json"
+                    })
+                        .then(
+                            function (res) {
+                                const registro = {
+                                    Codigo: res.Codigo,
+                                    Fecha: res.Fecha_De_Inicio,
+                                    Estado: res.Estado,
+                                    Nombre: res.NombreYApellido,
+                                    Tipo: res.Tipo,
+                                    Descripcion: res.Descripcion,
+                                    Email: res.Email,
+                                };
+                                registros.push(registro);
+                                refreshGrid(registros);
+                            })
+
+                }
+                function refreshGrid(registros) {
+                    var data = {
+                        identifier: 'id',
+                        items: registros
+                    };
+                    let store = new ItemFileWriteStore({ data: data });
+                    grid.store = store;
+                    grid.render();
+                }
+
+                /*Asigno la funcion de buscar reclamo al evento de presionar el boton de buscar
+                  y al de presionar la tecla ENTER*/
+                on(btnbuscar, "click", function (event) {
+                    let tgrid = dom.byId("tablaGrid");
+                    domAttr.set(tgrid, "style", { visibility: "visible" });
+                    searchReclamo();
+                    var data = {
+                        identifier: 'id',
+                        items: registros
+                    };
+                    let store = new ItemFileWriteStore({ data: data });
+                    grid.store = store;
+                    grid.render();
+                });
+                var ENTER = 13;
+                on(document, "keyup", function (event) {
+                    if (event.keyCode == ENTER) {
+                        var codigo = dom.byId("codigoReclamo").value;
+                        if (codigo != "") {
+                            let tgrid = dom.byId("tablaGrid");
+                            domAttr.set(tgrid, "style", { visibility: "visible" });
+                            searchReclamo();
+                            var data = {
+                                identifier: 'id',
+                                items: registros
+                            };
+                            let store = new ItemFileWriteStore({ data: data });
+                            grid.store = store;
+                            grid.render();
+                        }
+
+                    }
+                });
+            });
+    </script>
+</body>
+
+</html>
