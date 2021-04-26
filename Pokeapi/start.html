@@ -13,6 +13,8 @@
         href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/claro/EnhancedGrid.css">
     <link rel="stylesheet"
         href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/EnhancedGrid_rtl.css">
+    <!-- load dojo and provide config via data attribute -->
+    <script src="../../dojo/dojo.js" data-dojo-config="async: 1, parseOnLoad: 1"></script>
     <style type="text/css">
         /*Grid need a explicit width/height by default*/
 
@@ -30,17 +32,16 @@
             data-dojo-props="region: 'center', tabPosition: 'top'">
             <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'Buscador'">
                 <h4 style="background-color: rgba(250, 235, 215, 0.301);font-size:2vw;">Busca tu Pokemon</h4>
-                <p><b>Nota:</b> Podes buscar por nombre o por id</p>
+                <br>
                 <div>
                     <input id="pokemonName" name="pokemonSelect" data-dojo-props="
                         value: '',
                         placeHolder: 'Select a Pokemon'" />
                     <button id="botonRefresh">Buscar</button>
                 </div>
-            </div>
-            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'tabla con dojox/grid'">
+                <br>
                 <div class="grid">
-                    <div id="tablaGrid"></div>
+                    <div id="tablaGrid" style="visibility: hidden"></div>
                 </div>
             </div>
             <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'tabla con html'">
@@ -52,7 +53,7 @@
                                 <th>Altura</th>
                                 <th>Peso</th>
                                 <th>Tipo</th>
-                                <th>Batallas</th>
+                                <th>Nro. Id</th>
                                 <th>Frente</th>
                                 <th>Espalda</th>
 
@@ -70,8 +71,7 @@
         <div id="leftCol" class="edgePanel" data-dojo-type="dijit/layout/ContentPane"
             data-dojo-props="region: 'left', splitter: true">Contenido</div>
     </div>
-    <!-- load dojo and provide config via data attribute -->
-    <script src="../../dojo/dojo.js" data-dojo-config="async: 1, parseOnLoad: 1">
+    
     </script>
     <script>
         require(["dojo/dom", "dojo/on", "dojo/mouse", "dojo/request",
@@ -81,9 +81,6 @@
             "dijit/layout/TabContainer", "dojo/domReady!"], function (dom, on, mouse,
                 request, Memory, json, when, Deferred, FilteringSelect, domConstruct, html, coreFx,
                 domStyle, fx) {
-
-            let botonRefresh = dom.byId("botonRefresh");
-            let pokeArray = [];
 
             function setOptions() {
                 var deferred = new Deferred();
@@ -127,22 +124,14 @@
     <script>
         require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             "dojo/on", "dojo/request", "dojo/dom-construct", "dojo/dom-attr",
-            "dojox/grid/enhanced/plugins/Pagination", "dojo/store/DataStore", "dojo/store/Memory", "dojo/data/ObjectStore", 'dojo/domReady!'],
+            "dojox/grid/enhanced/plugins/Pagination", 'dojo/domReady!'],
 
             function (EnhancedGrid, ItemFileWriteStore, dom, on, request, domConstruct, domAttr,
-                Pagination, DataStore, Memory, ObjectStore) {
+                Pagination) {
 
                 const url = "https://pokeapi.co/api/v2/pokemon/";
                 let pokeArray = [];
-
-                /*set up data store*/
-                var data = {
-                    identifier: 'id',
-                    items: pokeArray
-                };
-                var rows = 60;
-
-                var store = new ItemFileWriteStore({ data: data });
+                let botonRefresh = dom.byId("botonRefresh");
 
                 /*set up layout*/
                 let layout = [
@@ -159,8 +148,8 @@
                         'name': 'Tipo',
                         'field': 'Tipo'
                     }, {
-                        'name': 'Batallas',
-                        'field': 'Batallas',
+                        'name': 'Nro. Id',
+                        'field': 'Id',
 
                     }, {
                         name: "Frente",
@@ -178,46 +167,12 @@
                         }
                     }]
                 ];
-
-                function searchPokemon() {
-                    var pokemonId = dom.byId("pokeStore").value;
-                    request.get(url + pokemonId, {
-                        handleAs: "json"
-                    })
-                        .then(
-                            function (res) {
-                                const pokeObjeto = {
-                                    id: pokeArray.length,
-                                    Nombre: res.name,
-                                    Tipo: res.types[0].type.name,
-                                    Altura: Math.round(res.height * 10),
-                                    Peso: Math.round(res.weight / 10),
-                                    Batallas: res.game_indices.length,
-                                    Frente: res.sprites.front_default,
-                                    Espalda: res.sprites.back_default,
-                                };
-                                pokeArray.push(pokeObjeto);
-                                refreshGrid(pokeArray);
-
-                                let tabla = dom.byId("tablaHtml");
-                                domAttr.set(tabla, "style", { visibility: "visible" });
-                                let node = domConstruct.create("tr", {
-                                    innerHTML: `<td>${pokeObjeto.Nombre}</td> <td>${pokeObjeto.Altura}</td> <td>${pokeObjeto.Peso}</td> <td>${pokeObjeto.Tipo}</td>  <td>${pokeObjeto.Batallas}</td>  <td><img alt="" src="${pokeObjeto.Frente}"/></td>  <td><img alt="" src="${pokeObjeto.Espalda}"/></td>`,
-                                });
-                                domConstruct.place(node, tabla);
-                            })
-
-                }
-                function refreshGrid(pokeArray) {
-                    var data = {
-                        identifier: 'id',
-                        items: pokeArray
-                    };
-                    let store = new ItemFileWriteStore({ data: data });
-                    grid.store = store;
-                    grid.render();
-                }
-
+                /*set up data store*/
+                var data = {
+                    identifier: 'id',
+                    items: pokeArray
+                };
+                let store = new ItemFileWriteStore({ data: data });
                 /*create a new grid:*/
                 var grid = new EnhancedGrid({
                     id: 'grid',
@@ -235,16 +190,58 @@
                     rowSelector: '20px'
                 },
                     document.createElement('div'));
-
+                
                 /*append the new grid to the div*/
-                //dom.byId("tablaGrid").appendChild(grid.domNode);
-                grid.placeAt("tablaGrid");
+                dom.byId("tablaGrid").appendChild(grid.domNode);
 
                 /*Call startup() to render the grid*/
                 grid.startup();
+
+                function searchPokemon() {
+                    var pokemonId = dom.byId("pokeStore").value;
+                    request.get(url + pokemonId, {
+                        handleAs: "json"
+                    })
+                        .then(
+                            function (res) {
+                                const pokeObjeto = {
+                                    id: pokeArray.length,
+                                    Nombre: res.name,
+                                    Tipo: res.types[0].type.name,
+                                    Altura: Math.round(res.height * 10),
+                                    Peso: Math.round(res.weight / 10),
+                                    Id: res.id,
+                                    Frente: res.sprites.front_default,
+                                    Espalda: res.sprites.back_default,
+                                };
+                                pokeArray.push(pokeObjeto);
+                                refreshGrid(pokeArray);
+
+                                let tabla = dom.byId("tablaHtml");
+                                domAttr.set(tabla, "style", { visibility: "visible" });
+                                
+                                let node = domConstruct.create("tr", {
+                                    innerHTML: `<td>${pokeObjeto.Nombre}</td> <td>${pokeObjeto.Altura}</td> <td>${pokeObjeto.Peso}</td> <td>${pokeObjeto.Tipo}</td>  <td>${pokeObjeto.Id}</td>  <td><img alt="" src="${pokeObjeto.Frente}"/></td>  <td><img alt="" src="${pokeObjeto.Espalda}"/></td>`,
+                                });
+                                domConstruct.place(node, tabla);
+                            })
+
+                }
+                function refreshGrid(pokeArray) {
+                    var data = {
+                        identifier: 'id',
+                        items: pokeArray
+                    };
+                    let store = new ItemFileWriteStore({ data: data });
+                    grid.store = store;
+                    grid.render();
+                }
+
                 /*Asigno la funcion de buscar pokemon al evento de presionar el boton de buscar
                   y al de presionar la tecla ENTER*/
                 on(botonRefresh, "click", function (event) {
+                    let tgrid = dom.byId("tablaGrid");
+                    domAttr.set(tgrid, "style", { visibility: "visible" });
                     searchPokemon();
                     var data = {
                         identifier: 'id',
@@ -259,6 +256,8 @@
                     if (event.keyCode == ENTER) {
                         var pokemonId = dom.byId("pokeStore").value;
                         if (pokemonId != "") {
+                            let tgrid = dom.byId("tablaGrid");
+                            domAttr.set(tgrid, "style", { visibility: "visible" });
                             searchPokemon();
                             var data = {
                                 identifier: 'id',
