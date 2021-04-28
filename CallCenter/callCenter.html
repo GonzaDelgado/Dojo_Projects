@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="utf-8">
@@ -13,31 +13,35 @@
         href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/claro/EnhancedGrid.css">
     <link rel="stylesheet"
         href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/EnhancedGrid_rtl.css">
+    
     <!-- load dojo and provide config via data attribute -->
     <script src="../../dojo/dojo.js" data-dojo-config="async: 1, parseOnLoad: 1"></script>
     <style type="text/css">
         /*Grid need a explicit width/height by default*/
 
-        #grid {
-            width: 51em;
-            height: 450px;
+        #tablaGrid {
+            width: 79em;
+            height: 64px;
         }
     </style>
 </head>
 
 <body class="claro">
+    <div class="loader"></div>
     <div id="appLayout" class="demoLayout" data-dojo-type="dijit/layout/BorderContainer"
         data-dojo-props="design: 'headline'">
         <div class="centerPanel" data-dojo-type="dijit/layout/TabContainer"
             data-dojo-props="region: 'center', tabPosition: 'top'">
-            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'Buscador'">
-                <h4>Consultar Reclamo</h4>
+            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'Buscar o añadir reclamo'">
+                <div><button id="btnagregar" class="buttonRed">Añadir un reclamo</button></div>
                 <br>
-                <div>
+                <div  class="text-center">
+                    <h3>Consultar Reclamo</h3>
+                    <br>
                     <input type="search" name="codigoReclamo" id="codigoReclamo">
                     
-
-                    <button id="btnbuscar">Buscar</button>
+                    <br><br>
+                    <button id="btnbuscar" class="buttonRed">Buscar</button>
                 </div>
                 <br>
                 <div class="grid">
@@ -51,7 +55,13 @@
                 WIDTH="160" HEIGHT="70">
         </div>
         <div id="leftCol" class="edgePanel" data-dojo-type="dijit/layout/ContentPane"
-            data-dojo-props="region: 'left', splitter: true" style="background-color: rgb(255, 255, 255);">Panel izquierdo</div>
+            data-dojo-props="region: 'left', splitter: true" style="background-color: #fdb1b1;">
+            <div class="text-center">
+                <img src="https://www.hsbc.com.ar/content/dam/hsbc/hbar/images/mi-hsbc/hsbc-mi-hsbc-chat.jpg" alt="Chat online hsbc" height="30%" width="95%">
+                <a href="https://www.argentina.hsbc.com.ar/livechat.html" target="_blank" style="color: black;font-size: large;font-family: 'Times New Roman', Times, serif;">Chat Online</a>
+                <p>Hacenos tu pregunta de forma rápida y simple.</p>
+            </div>    
+        </div>
     </div>
     
     </script>
@@ -59,39 +69,49 @@
     <script>
         require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             "dojo/on", "dojo/request", "dojo/dom-construct", "dojo/dom-attr",
-            "dojox/grid/enhanced/plugins/Pagination", 'dojo/domReady!'],
+            "dojox/grid/enhanced/plugins/Pagination", "dijit/form/Textarea", 'dojox/validate/web', 'dojo/domReady!'],
 
             function (EnhancedGrid, ItemFileWriteStore, dom, on, request, domConstruct, domAttr,
-                Pagination) {
+                Pagination, Textarea, validate) {
 
-                const url = "https://60870b4fa3b9c200173b7792.mockapi.io/Reclamos";
+                const url = "https://60870b4fa3b9c200173b7792.mockapi.io/Reclamos/";
                 let botonBuscar = dom.byId("btnbuscar");
+                let botonAgregar = dom.byId("btnagregar");
+                let botonCancelar = dom.byId("btncancelar"); 
+                let botonEnviar = dom.byId("btnenviar");
                 let registros = [];
 
                 /*set up layout*/
                 let layout = [
                     [{
                         'name': 'Código',
-                        'field': 'Codigo'
+                        'field': 'Codigo',
+                        width: "75px"
                     }, {
                         'name': 'Fecha',
-                        'field': 'Fecha'
+                        'field': 'Fecha',
+                        width: "90px"
                     }, {
                         'name': 'Estado',
-                        'field': 'Estado'
+                        'field': 'Estado',
+                        width: "105px"
                     }, {
-                        'name': 'Nombre',
-                        'field': 'Nombre'
+                        'name': 'Nombre Completo',
+                        'field': 'Nombre',
+                        width: "165px"
                     }, {
                         'name': 'Tipo',
                         'field': 'Tipo',
+                        width: "105px"
 
                     }, {
                         'name': 'Descripción',
                         'field': 'Descripcion',
+                        width: "190px"
                     }, {
                         'name': 'Email',
                         'field': 'Email',
+                        width: "190px"
                     }]
                 ];
                 /*set up data store*/
@@ -114,7 +134,7 @@
                     },
                     editable: true,
                     structure: layout,
-                    rowSelector: '20px'
+                    rowSelector: '10px'
                 },
                     document.createElement('div'));
                 
@@ -135,11 +155,12 @@
                                     Codigo: res.Codigo,
                                     Fecha: res.Fecha_De_Inicio,
                                     Estado: res.Estado,
-                                    Nombre: res.NombreYApellido,
+                                    Nombre: res.NombreyApellido,
                                     Tipo: res.Tipo,
                                     Descripcion: res.Descripcion,
                                     Email: res.Email,
                                 };
+                                registros.pop();
                                 registros.push(registro);
                                 refreshGrid(registros);
                             })
@@ -147,7 +168,7 @@
                 }
                 function refreshGrid(registros) {
                     var data = {
-                        identifier: 'id',
+                        identifier: 'Codigo',
                         items: registros
                     };
                     let store = new ItemFileWriteStore({ data: data });
@@ -188,7 +209,99 @@
 
                     }
                 });
+                /*hago visible el formulario cuando apreto en añadir un reclamo*/
+                on(botonAgregar, "click", function (event) {
+                    myDialog.show();
+                });
+                /*oculto el formulario cuando apreto el boton de cancelar*/
+                on(botonCancelar, "click", function (event) {
+                    myDialog.hide();
+                });
             });
+    </script>
+    <!--    Dialog    -->
+    <div data-dojo-type="dijit/Dialog" data-dojo-id="myDialog" title="Agregar Reclamo" style="width: 50%;" class="text-center">
+        <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm" 
+            encType="multipart/form-data" action="" method="post">
+            <!--
+            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                <div data-dojo-type="dijit/form/TextBox" title="Nombre y Apellido:" id="txtnombre" name="txtnombre" value=""></div>
+                <select data-dojo-type="dijit/form/ComboBox" title="Estado:" id="cbxestado" name="cbxestado">
+                    <option value="Por iniciar">Por iniciar</option>
+                    <option value="En Proceso">En Proceso</option>
+                    <option value="Derivado a Service">Derivado a Service</option>
+                    <option value="En Espera">En Espera</option>
+                </select>
+                <select data-dojo-type="dijit/form/ComboBox" title="Tipo:" id="cbxtipo" name="cbxtipo">
+                    <option value="Homebanking">Homebanking</option>
+                    <option value="Finanzas">Finanzas</option>
+                    <option value="Beneficios">Beneficios</option>
+                    <option value="Tarjeta de Credito">Tarjeta de Crédito</option>
+                </select>
+                <div data-dojo-type="dijit/form/ValidationTextBox" 
+                    data-dojo-props="validator:dojox.validate.isEmailAddress,
+                         invalidMessage:'Por favor, ingresá un E-mail válido.'" title="Email:" 
+                    name="txtemail" id="txtemail" value=""></div>
+                <div data-dojo-type="dijit/form/SimpleTextarea" title="Descripcion:" id="txtadescripcion" name="txtadescripcion" value="" rows="3" style="width: auto;"></div>
+            </div>-->
+            
+            <script type="dojo/on" data-dojo-event="submit">
+                if(this.validate()){ confirmar.show(); }else{ alerta.show(); return false; } return true;
+            </script>
+            <table class="dijitDialogPaneContentArea" >
+                <tr>
+                    <td><label for="name">Nombre y Apellido:</label></td>
+                    <td><input data-dojo-type="dijit/form/ValidationTextBox" required="true" name="name" id="name"></td>
+                </tr>
+                <tr>
+                    <td><label for="estado">Estado:</label></td>
+                    <td><select data-dojo-type="dijit/form/ComboBox" id="estado" name="estado" required="true">
+                        <option>Por iniciar</option>
+                        <option selected>En Proceso</option>
+                        <option>Derivado a Service</option>
+                        <option>En Espera</option>
+                    </select></td>
+                </tr>
+                <tr>
+                    <td><label for="tipo">Tipo:</label></td>
+                    <td><select data-dojo-type="dijit/form/ComboBox" id="tipo" name="tipo" required="true">
+                        <option>Homebanking</option>
+                        <option selected>Finanzas</option>
+                        <option>Beneficios</option>
+                        <option>Tarjeta de Crédito</option>
+                    </select></td>
+                </tr>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="email">Email:</label>
+                    </td>
+                    <td>
+                        <input id="email" name="email" data-dojo-type="dijit/form/ValidationTextBox" required="true" data-dojo-props="validator:dojox.validate.isEmailAddress,
+                        invalidMessage:'Por favor, ingresá un E-mail válido. Es necesario que lo cargues para poder continuar con la solicitud.'">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="descripcion">Descripcion:</label>
+                    </td>
+                    <td>
+                        <input id="descripcion" name="descripcion" data-dojo-type="dijit/form/SimpleTextarea"></td>
+                </tr>
+            </table>
+
+            <div class="dijitDialogPaneActionBar">
+                <button data-dojo-type="dijit/form/Button" type="submit" id="btnenviar">Enviar</button>
+                <button data-dojo-type="dijit/form/Button" type="button" id="btncancelar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <!-- load jquery for gif of load -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(window).load(function() {
+            $(".loader").fadeOut("slow");
+        });
     </script>
 </body>
 

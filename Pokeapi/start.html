@@ -13,6 +13,13 @@
         href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/claro/EnhancedGrid.css">
     <link rel="stylesheet"
         href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/EnhancedGrid_rtl.css">
+    <!-- load jquery for gif of load -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(window).load(function() {
+            $(".loaderPika").fadeOut("slow");
+        });
+    </script>
     <!-- load dojo and provide config via data attribute -->
     <script src="../../dojo/dojo.js" data-dojo-config="async: 1, parseOnLoad: 1"></script>
     <style type="text/css">
@@ -26,6 +33,7 @@
 </head>
 
 <body class="claro">
+    <div class="loaderPika"></div>
     <div id="appLayout" class="demoLayout" data-dojo-type="dijit/layout/BorderContainer"
         data-dojo-props="design: 'headline'">
         <div class="centerPanel" data-dojo-type="dijit/layout/TabContainer"
