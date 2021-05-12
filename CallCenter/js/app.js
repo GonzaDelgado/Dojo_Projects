@@ -1,18 +1,20 @@
 require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
     "dojo/on", "dojo/request", "dojo/dom-construct", "dojo/dom-attr",
-    "dojox/grid/enhanced/plugins/Pagination", "dijit/form/Textarea", 'dojox/validate/web', 'dojox/form/PasswordValidator', 'dojo/when', 'dojo/domReady!'],
+    "dojox/grid/enhanced/plugins/Pagination", "dijit/form/Textarea", 'dojox/validate/web', 'dojox/form/PasswordValidator', 'dijit/Dialog', 'dojo/domReady!'],
 
     function (EnhancedGrid, ItemFileWriteStore, dom, on, request, domConstruct, domAttr,
-        Pagination, Textarea, validate, PasswordValidator, when) {
+        Pagination, Textarea, validate, PasswordValidator, Dialog) {
 
         const url = "https://60870b4fa3b9c200173b7792.mockapi.io/Reclamos/";
         let botonBuscar = dom.byId("btnbuscar");
         let botonAgregar = dom.byId("btnagregar");
         let botonRegistrar = dom.byId("btnregistro");
         let botonLogin = dom.byId("btniniciar");
+        let botonLogout = dom.byId("btnlogout");
         let botonCancelar = dom.byId("btncancelar");
         let botonEnviar = dom.byId("btnenviar");
         let registros = [];
+        actualizarLogin();
 
         /*set up layout*/
         let layout = [
@@ -108,12 +110,16 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             grid.store = store;
             grid.render();
         }
+        /*dialogo campos invalidos
+        var dialogCampos = new Dialog({
+            id: 'camposInvalidos',
+            title: 'Campos invalidos'
+        });*/
 
         /*Asigno la funcion de buscar reclamo al evento de presionar el boton de buscar
           y al de presionar la tecla ENTER*/
         on(btnbuscar, "click", function (event) {
-            let tgrid = dom.byId("tablaGrid");
-            domAttr.set(tgrid, "style", { visibility: "visible" });
+            dojo.query('#tablaGrid').style('display', 'block');
             searchReclamo();
             var data = {
                 identifier: 'id',
@@ -128,8 +134,7 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             if (event.keyCode == ENTER) {
                 var codigo = dom.byId("codigoReclamo").value;
                 if (codigo != "") {
-                    let tgrid = dom.byId("tablaGrid");
-                    domAttr.set(tgrid, "style", { visibility: "visible" });
+                    dojo.query('#tablaGrid').style('display', 'block');
                     searchReclamo();
                     var data = {
                         identifier: 'id',
@@ -148,10 +153,15 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
         });
         on(botonRegistrar, "click", function (event) {
             registro.show();
-            //let usuarioyaregistrado = false;
-            //let username = document.getElementById("codigoReclamo").value;
-            //const urlsub = "https://60870b4fa3b9c200173b7792.mockapi.io/Login/";
-            
         });
+        on(botonLogin, "click", function (event) {
+            login.show();
+        });
+        on(botonLogout, "click", function (event) {
+            cerrarSesion.show();
+        });
+        /*on(dom.byId("cerrarCamposInv"), "click", function(evt){
+            camposInvalidos.hide();
+        });*/
     }
 );

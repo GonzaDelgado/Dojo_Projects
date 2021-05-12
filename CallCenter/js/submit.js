@@ -1,67 +1,83 @@
-function submitRegistro() {
-    let formRegistro = document.getElementById("formRegistro");
-    let username = document.getElementById("username").value;
-    let email = document.getElementById("emailReg").value;
-    let emailConf = document.getElementById("emailRegConf").value;
-    let password = document.getElementById("pass").value;
-    let passwordConf = document.getElementById("passConf").value;
-    let employeeYes = document.getElementById("employeeYes").checked;
-    let res = false;
-    if (email != emailConf) {
-        emailAlert.show();
-        return false;
-    }
-    if (password != passwordConf) {
-        passAlert.show();
-        return false;
-    }
-    let isemployee = false;
-    let id = 0;
-    if (employeeYes) {
-        isemployee = true;
-        id = document.getElementById("employeeId").value;
-    }
-    if (formRegistro.validate()) {
-        const data = {
-            'username': username,
-            'password': password,
-            'email': email,
-            'employee': isemployee,
-            'idEmployee': id
-        };
-        const urlsub = "https://60870b4fa3b9c200173b7792.mockapi.io/Login/";
-        let usuarioyaregistrado = false;
-        require(["dojo/request"], function (request) {
-            //Veo si el usuario ya esta registrado
-            request.get(urlsub + "?search=" + username, {
-                handleAs: "json"
-            }).then(function (response) {
-                if (response.length >= 1) {
-                    usuarioyaregistrado = true;
-                } else {
-                    //Si el usuario no esta registrado lo registro
-                    request.post(urlsub, {
-                        handleAs: "json",
-                        data: data
-                    }).then(function (text) {
-                        console.log("The server returned: ", text);
+require(["dojo/_base/array", "dojo/_base/event", "dojo/query", "dojox/validate/web", "dojox/validate/us", "dojox/validate/check", "dojo/domReady!"],
+    function (arrayUtil, baseEvent, query, validate) {
+
+        function doCheck(form) {
+            var results = validate.check(form, profile);
+
+            if (results.isSuccessful()) {
+                //	Si los campos estan correctos llamo a la funcion que realiza el post a la mockapi
+                agregarReclamo();
+            } else {
+                var s = "";
+                var missing = results.getMissing();
+                if (missing.length) {
+                    s += '<h4 class="resCamposInvalidos">Olvidaste completar los siguientes campos:</h4>'
+                        + '<ol class="resCamposInvalidos">';
+                    arrayUtil.forEach(missing, function (campo) {
+                        s += '<li>' + campo + '</li>';
                     });
+                    s += '</ol>';
                 }
-                if (usuarioyaregistrado) {
-                    usuarioregistrado.show();
-                    res = false;
-                } else {
-                    exito.show();
-                    dojo.query('#onlyEmployee').style('display', 'none');
-                    registro.reset();
-                    registro.hide();
-                    res = true;
+
+                var invalid = results.getInvalid();
+                if (invalid.length) {
+                    s += '<h4 class="resCamposInvalidos">Los siguientes campos son invalidos:</h4>'
+                        + '<ol class="resCamposInvalidos">';
+                    arrayUtil.forEach(invalid, function (field) {
+                        s += '<li>' + field + '</li>';
+                    });
+                    s += '</ol>';
                 }
-            });
+                var buttonCerrar = `<div class="dijitDialogPaneActionBar" id="camposInvalidosBtnPanel">
+                                        <button data-dojo-type="dijit/form/Button" type="button" onClick="camposInvalidos.hide();" id="cerrarCamposInv"
+                                            class="buttonRed">Ok</button>
+                                    </div>`;
+                camposInvalidos.set("content",s + buttonCerrar);
+                camposInvalidos.show();
+            }
+        }
+
+        //	wait until after our requires are actually loaded.
+        profile = {
+            trim: ["nombreyApellido"],
+            required: ["nombreyApellido", "estado", "tipo", "email", "confirmarEmail"],
+            constraints: {
+                nombreyApellido: validate.isText,
+                estado: validate.isText,
+                tipo: validate.isText,
+                email: [validate.isEmailAddress, false, true],
+                confirmarEmail: [validate.isEmailAddress, false, true]
+            },
+            confirm: {
+                "confirmarEmail": "email"
+            }
+        };
+
+        //	set up the form handler.
+        var f = query("#myForm")[0];
+        f.onsubmit = function (e) {
+            baseEvent.stop(e);
+            doCheck(f);
+        };
+    });
+function agregarReclamo() {
+    const data = {
+        'Estado': document.getElementById("estado").value,
+        'NombreyApellido': document.getElementById("name").value,
+        'Tipo': document.getElementById("tipo").value,
+        'Descripcion': document.getElementById("descripcion").value,
+        'Email': document.getElementById("email").value
+    };
+    const urlsub = "https://60870b4fa3b9c200173b7792.mockapi.io/Reclamos/";
+    require(["dojo/request"], function (request) {
+        request.post(urlsub, {
+            handleAs: "json",
+            data: data
+        }).then(function (text) {
+            console.log("El servidor retornó: ", text);
         });
-    } else {
-        alerta.show();
-        res = false;
-    }
-    return res;
+    });
+    exito.show();
+    myDialog.reset();
+    myDialog.hide();
 }

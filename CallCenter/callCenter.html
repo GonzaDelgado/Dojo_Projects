@@ -36,28 +36,30 @@
                 <div><button id="btnagregar" class="buttonRed">Añadir un reclamo</button></div>
                 <br>
                 <div class="text-center">
-                    <h3>Consultar Reclamo</h3>
+                    <h3 id="consultarReclamo">Consultar Reclamo</h3>
                     <br>
-                    <input type="search" name="codigoReclamo" id="codigoReclamo">
+                    <input class="reclamo" type="search" name="codigoReclamo" id="codigoReclamo">
 
                     <br><br>
-                    <button id="btnbuscar" class="buttonRed">Buscar</button>
+                    <button class="reclamo" id="btnbuscar"
+                        style="background-color: #ff9a9a;border: 1px solid #c07676;">Buscar</button>
                 </div>
                 <br>
                 <div class="grid">
-                    <div id="tablaGrid" style="visibility: hidden"></div>
+                    <div id="tablaGrid" style="display: none"></div>
                 </div>
             </div>
         </div>
 
         <div class="edgePanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'"
             style="background-color: rgb(255, 255, 255);">
-            <div id="bienvenido" class="text-right"><strong>Invitado</strong></div>
+            <div id="bienvenido" class="text-right" style="font-size: 1.5em"></div>
             <img src="https://www.hsbc.com.ar/content/dam/hsbc/hbar/images/index/HSBC_MASTERBRAND_LOGO_RGB.svg"
                 alt="HSBC logo" WIDTH="160" HEIGHT="70">
             <div style="text-align: right;">
                 <button id="btnregistro" class="buttonRed">REGISTRARSE</button>
                 <button id="btniniciar" class="buttonRed">INICIAR SESIÓN</button>
+                <button id="btnlogout" class="buttonRed">CERRAR SESIÓN</button>
             </div>
         </div>
         <div id="leftCol" class="edgePanel" data-dojo-type="dijit/layout/ContentPane"
@@ -73,62 +75,29 @@
     </div>
 
     </script>
+    <script src="js/logIn.js"></script>
+    <script src="js/logUp.js"></script>
     <script src="js/app.js"></script>
+    
 
-    <!--    Dialog    -->
+    <!-- Formulario para agregar reclamo -->
+
     <div data-dojo-type="dijit/Dialog" data-dojo-id="myDialog" title="Agregar Reclamo" style="width: 50%;"
         class="text-center">
-        <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm" encType="multipart/form-data" action=""
-            method="post">
-
-            <script type="dojo/on" data-dojo-event="submit">
-                event.preventDefault();
-                if (this.validate()) {
-                    const data = {
-                        'Estado': document.getElementById("estado").value,
-                        'NombreyApellido': document.getElementById("name").value,
-                        'Tipo': document.getElementById("tipo").value,
-                        'Descripcion': document.getElementById("descripcion").value,
-                        'Email':document.getElementById("email").value
-                    };
-                    const urlsub = "https://60870b4fa3b9c200173b7792.mockapi.io/Reclamos/";
-                    require(["dojo/request"],function(request){
-                        request.post(urlsub, {
-                            handleAs: "json",
-                            data: data
-                        }).then(function(text){
-                            console.log("The server returned: ", text);
-                        });
-                    });
-                    exito.show();
-                    myDialog.reset();
-                    myDialog.hide();
-                } else {
-                    alerta.show();
-                    return false;
-                }
-                return true;
-                
-                /*event.preventDefault();
-                if(this.validate()){
-                    return confirmar.show();
-                }else{
-                    alerta.show();
-                    return false;
-                }
-                return true;*/
-            </script>
-            <!--<script type="dojo/method" src="js/submit.js" data-dojo-event="submit"></script>-->
-
+        <form method="POST" id="myForm">
             <table class="dijitDialogPaneContentArea">
                 <tr>
-                    <td><label for="name">Nombre y Apellido:</label></td>
-                    <td><input data-dojo-type="dijit/form/ValidationTextBox" placeholder="nombre apellido" data-dojo-props="missingMessage:'Campo obligatorio!'" required="true" name="name" id="name">*
+                    <td><label for="nombreyApellido">Nombre y Apellido:</label></td>
+                    <td><input data-dojo-type="dijit/form/ValidationTextBox" placeholder="nombre apellido"
+                            data-dojo-props="missingMessage:'Campo obligatorio!'" required="true" name="nombreyApellido"
+                            id="nombreyApellido">*
                     </td>
                 </tr>
                 <tr>
                     <td><label for="estado">Estado:</label></td>
-                    <td><select data-dojo-type="dijit/form/ComboBox" placeholder="--Selecciona--" data-dojo-props="missingMessage:'Campo obligatorio!'" id="estado" name="estado" required="true">
+                    <td><select data-dojo-type="dijit/form/ComboBox" placeholder="--Selecciona--"
+                            data-dojo-props="missingMessage:'Campo obligatorio!'" id="estado" name="estado"
+                            required="true">
                             <option selected></option>
                             <option>Por iniciar</option>
                             <option>En Proceso</option>
@@ -138,7 +107,8 @@
                 </tr>
                 <tr>
                     <td><label for="tipo">Tipo:</label></td>
-                    <td><select data-dojo-type="dijit/form/ComboBox" placeholder="--Selecciona--" data-dojo-props="missingMessage:'Campo obligatorio!'" id="tipo" name="tipo" required="true">
+                    <td><select data-dojo-type="dijit/form/ComboBox" placeholder="--Selecciona--"
+                            data-dojo-props="missingMessage:'Campo obligatorio!'" id="tipo" name="tipo" required="true">
                             <option selected></option>
                             <option>Homebanking</option>
                             <option>Finanzas</option>
@@ -152,9 +122,18 @@
                         <label for="email">Email:</label>
                     </td>
                     <td>
-                        <input id="email" name="email" data-dojo-type="dijit/form/ValidationTextBox" required="true" placeholder="miMail@mail.com"
-                            data-dojo-props="validator:dojox.validate.isEmailAddress,
-                        invalidMessage:'Por favor, ingresá un E-mail válido. Es necesario que lo cargues para poder continuar con la solicitud.',
+                        <input id="email" name="email" data-dojo-type="dijit/form/ValidationTextBox" required="true"
+                            placeholder="miMail@mail.com" data-dojo-props="invalidMessage:'Por favor, ingresá un E-mail válido. Es necesario que lo cargues para poder continuar con la solicitud.',
+                        missingMessage:'Campo obligatorio!'">*
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="confirmarEmail">Confirmar Email:</label>
+                    </td>
+                    <td>
+                        <input id="confirmarEmail" name="confirmarEmail" data-dojo-type="dijit/form/ValidationTextBox"
+                            required="true" data-dojo-props="invalidMessage:'Los emails deben coincidir!',
                         missingMessage:'Campo obligatorio!'">*
                     </td>
                 </tr>
@@ -170,8 +149,7 @@
             </table>
 
             <div class="dijitDialogPaneActionBar">
-                <button class="buttonRed" data-dojo-type="dijit/form/Button" type="submit"
-                    id="btnenviar">Enviar</button>
+                <input type="submit" value="Enviar" class="buttonRed">
                 <div data-dojo-type="dijit/form/Button" type="button" id="btncancelar" class="buttonRed">
                     <script type="dojo/on" data-dojo-event="click">
                         myDialog.hide();
@@ -180,10 +158,13 @@
                     Cancelar
                 </div>
             </div>
-        </div>
+    </div>
+    </div>
+    </form>
+
     </div>
 
-    <!-- formulario de registro -->
+    <!-- FORMULARIO DE REGISTRO -->
 
     <div data-dojo-type="dijit/Dialog" data-dojo-id="registro" title="Registrar Usuario" style="width: 50%;"
         class="text-center">
@@ -192,69 +173,7 @@
 
             <script type="dojo/on" data-dojo-event="submit">
                 event.preventDefault();
-                let username = document.getElementById("username").value;
-                let email = document.getElementById("emailReg").value;
-                let emailConf = document.getElementById("emailRegConf").value;
-                let password = document.getElementById("pass").value;
-                let passwordConf = document.getElementById("passConf").value;
-                let employeeYes = document.getElementById("employeeYes").checked;
-                let res = false;
-                if(email != emailConf){
-                    emailAlert.show();
-                    return false;
-                }
-                if(password != passwordConf){
-                    passAlert.show();
-                    return false;
-                }
-                let isemployee = false;
-                let id = 0;
-                if(employeeYes){
-                  isemployee = true;
-                  id = document.getElementById("employeeId").value;
-                }
-                if (this.validate()) {
-                    const data = {
-                        'username': username,
-                        'password': password,
-                        'email': email,
-                        'employee': isemployee,
-                        'idEmployee': id
-                    };
-                    const urlsub = "https://60870b4fa3b9c200173b7792.mockapi.io/Login/";
-                    let usuarioyaregistrado = false;
-                    require(["dojo/request"], function (request) {
-                        //Veo si el usuario ya esta registrado
-                        request.get(urlsub + "?search=" + username, {
-                            handleAs: "json"
-                        }).then(function (response) {
-                            if (response.length >= 1) {
-                                usuarioyaregistrado = true;
-                            } else {
-                                //Si el usuario no esta registrado lo registro
-                                request.post(urlsub, {
-                                    handleAs: "json",
-                                    data: data
-                                }).then(function (text) {
-                                    console.log("The server returned: ", text);
-                                });
-                            }
-                            if (usuarioyaregistrado) {
-                                usuarioregistrado.show();
-                                res = false;
-                            } else {
-                                exito.show();
-                                dojo.query('#onlyEmployee').style('display', 'none');
-                                registro.reset();
-                                registro.hide();
-                                res = true;
-                            }
-                        });
-                    });
-                } else {
-                    alerta.show();
-                    res = false;
-                }
+                let res = verificarRegistro(this);
                 return res;
             </script>
 
@@ -262,13 +181,14 @@
                 <table class="dijitDialogPaneContentArea" cellpadding="10" style="margin-top: 0.5em;">
                     <tr>
                         <td><label for="username"><strong>Nombre de Usuario:</strong></label></td>
-                        <td><input data-dojo-type="dijit/form/ValidationTextBox" placeholder="usuario123" required="true" name="username"
-                                id="username">*</td>
+                        <td><input data-dojo-type="dijit/form/ValidationTextBox" placeholder="usuario123"
+                                required="true" name="username" id="username">*</td>
                     </tr>
                     <tr>
                         <td><label><strong>Contraseña:</strong></label></td>
-                        <td><input id="pass" type="password" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="invalidMessage:'La contraseña debe tener entre 6 y 20 caracteres'"
-                            required="true" pattern=".{6,20}"/>*</td>
+                        <td><input id="pass" type="password" data-dojo-type="dijit/form/ValidationTextBox"
+                                data-dojo-props="invalidMessage:'La contraseña debe tener entre 6 y 20 caracteres'"
+                                required="true" pattern=".{6,20}" />*</td>
                     </tr>
                     <tr>
                         <td><label><strong>Confirmar Contraseña:</strong></label></td>
@@ -290,10 +210,8 @@
                             <label for="emailRegConf"><strong>Confirmar Email:</strong></label>
                         </td>
                         <td>
-                            <input id="emailRegConf" name="emailRegConf" 
-                                data-dojo-type="dijit/form/ValidationTextBox"
-                                required="true" placeholder="miMail@mail.com"
-                                data-dojo-props="validator:dojox.validate.isEmailAddress,
+                            <input id="emailRegConf" name="emailRegConf" data-dojo-type="dijit/form/ValidationTextBox"
+                                required="true" placeholder="miMail@mail.com" data-dojo-props="validator:dojox.validate.isEmailAddress,
                         invalidMessage:'Los emails deben coincidir', missingMessage:'Los emails deben coincidir'">*
                         </td>
                     </tr>
@@ -301,24 +219,24 @@
                     <tr>
                         <td valign="top"><strong>¿Es empleado?: </strong></td>
                         <td>
-                            <input type="radio" id="employeeYes" name="employee" 
-                            data-dojo-type="dijit/form/RadioButton" 
-                            data-dojo-props="onClick:function(){
+                            <input type="radio" id="employeeYes" name="employee" data-dojo-type="dijit/form/RadioButton"
+                                data-dojo-props="onClick:function(){
                                 dojo.query('#onlyEmployee').style('display', 'contents');
                                 document.querySelector('#employeeId').required = true;}" />
                             <label for="radio1">Si</label>
                             &nbsp;&nbsp;&nbsp;
-                            <input type="radio" id="employeeNo" name="employee" checked="checked" 
-                            data-dojo-type="dijit/form/RadioButton" data-dojo-props="onClick:function(){
+                            <input type="radio" id="employeeNo" name="employee" checked="checked"
+                                data-dojo-type="dijit/form/RadioButton" data-dojo-props="onClick:function(){
                                 dojo.query('#onlyEmployee').style('display', 'none');
-                                document.querySelector('#employeeId').required = false;}"/>
+                                document.querySelector('#employeeId').required = false;}" />
                             <label for="radio2">No</label>
                         </td>
                     </tr>
                     <tr id="onlyEmployee" style="display: none;">
                         <td><label for="employeeId"><strong>Id:</strong></label></td>
-                        <td><input data-dojo-type="dijit/form/ValidationTextBox" required="false" 
-                            name="employeeId" id="employeeId">*</td>
+                        <td><input data-dojo-type="dijit/form/NumberTextBox" data-dojo-props="constraints:{min:1,max:2000000}, invalidMessage:'Por favor, ingresa un valor numerico.',
+                            rangeMessage:'Ingresa un valor mayor a 1 y menor a 2000000'" required="false" name="employeeId"
+                                id="employeeId">*</td>
                     </tr>
 
                 </table>
@@ -340,6 +258,56 @@
             </div>
         </div>
     </div>
+    <!-- Formulario de inicio de sesión -->
+
+    <div data-dojo-type="dijit/Dialog" data-dojo-id="login" title="Iniciar Sesión" style="width: 50%;"
+        class="text-center">
+        <div data-dojo-type="dijit/form/Form" id="formLogin" data-dojo-id="formLogin" encType="multipart/form-data"
+            action="" method="post">
+
+            <script type="dojo/on" data-dojo-event="submit">
+                event.preventDefault();
+                let username = document.getElementById("usernamelog").value;
+                let password = document.getElementById("passlog").value;
+                let res = false;
+                if (this.validate()) {
+                    res = verificarLogin(username, password);
+                } else {
+                    alerta.show();
+                    res = false;
+                }
+                return res;
+            </script>
+
+            <fieldset style="border:inset 2px #769DC0">
+                <table class="dijitDialogPaneContentArea" cellpadding="10" style="margin-top: 0.5em;">
+                    <tr>
+                        <td><label for="usernamelog"><strong>Nombre de Usuario:</strong></label></td>
+                        <td><input data-dojo-type="dijit/form/ValidationTextBox" required="true" name="usernamelog"
+                                id="usernamelog"></td>
+                    </tr>
+                    <tr>
+                        <td><label><strong>Contraseña:</strong></label></td>
+                        <td><input id="passlog" type="password" data-dojo-type="dijit/form/ValidationTextBox"
+                                data-dojo-props="invalidMessage:'Ingresa una contraseña'" required="true" /></td>
+                    </tr>
+
+                </table>
+            </fieldset>
+            <div class="dijitDialogPaneActionBar">
+                <button data-dojo-type="dijit/form/Button" type="submit" id="btnefectivelogin" class="buttonRed">Iniciar
+                    Sesión</button>
+                <div data-dojo-type="dijit/form/Button" type="button" id="btncerrarlogin" class="buttonRed">
+                    <script type="dojo/on" data-dojo-event="click">
+                        login.hide();
+                        login.reset();
+                    </script>
+                    Cerrar
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Popups -->
     <div data-dojo-type="dijit/Dialog" data-dojo-id="alerta" title="Datos invalidos">
         <p>Uno o mas campos estan vacios o son invalidos, por favor verifique el formulario.</p>
@@ -387,10 +355,44 @@
         <p>Formulario enviado correctamente.</p>
 
         <div class="dijitDialogPaneActionBar">
-            <button data-dojo-type="dijit/form/Button" type="button"
-                data-dojo-props="onClick:function(){exito.hide();}" class="buttonRed">Ok</button>
+            <button data-dojo-type="dijit/form/Button" type="button" data-dojo-props="onClick:function(){exito.hide();}"
+                class="buttonRed">Ok</button>
         </div>
     </div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-id="cerrarSesion" title="Cerrar Sesión">
+        <p>¿Está seguro que desea cerrar sesión?</p>
+
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="button"
+                data-dojo-props="onClick:function(){localStorage.clear();actualizarLogin();cerrarSesion.hide();}"
+                class="buttonRed">Si</button>
+            <button data-dojo-type="dijit/form/Button" type="button"
+                data-dojo-props="onClick:function(){cerrarSesion.hide();}" class="buttonRed">No</button>
+        </div>
+    </div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-id="invalid" title="Datos invalidos">
+        <p>Usuario o contraseña invalidos. Intente nuevamente.</p>
+
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="button"
+                data-dojo-props="onClick:function(){invalid.hide();}" class="buttonRed">Ok</button>
+        </div>
+    </div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-id="sesionIniciada" title="Sesión Iniciada">
+        <p>Sesion iniciada satisfactoriamente.</p>
+
+        <div class="dijitDialogPaneActionBar">
+            <button data-dojo-type="dijit/form/Button" type="button"
+                data-dojo-props="onClick:function(){sesionIniciada.hide();}" class="buttonRed">Ok</button>
+        </div>
+    </div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-id="camposInvalidos" id="camposInvalidos" title="Campos invalidos">
+        <div class="dijitDialogPaneActionBar" id="camposInvalidosBtnPanel">
+            <button data-dojo-type="dijit/form/Button" type="button" onClick="camposInvalidos.hide();" id="cerrarCamposInv"
+                class="buttonRed">Ok</button>
+        </div>
+    </div>
+    <script src="js/submit.js"></script>
     <!-- load jquery for gif of load -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script type="text/javascript">
