@@ -1,0 +1,85 @@
+<div data-dojo-type="dijit/form/Form" id="formRegistro" data-dojo-id="formRegistro" encType="multipart/form-data"
+    action="" method="post">
+
+    <script type="dojo/on" data-dojo-event="submit">
+                event.preventDefault();
+                let res = verificarRegistro(this);
+                return res;
+            </script>
+
+    <fieldset style="border:inset 2px #769DC0">
+        <table class="dijitDialogPaneContentArea" cellpadding="10" style="margin-top: 0.5em;">
+            <tr>
+                <td><label for="username"><strong>Nombre de Usuario:</strong></label></td>
+                <td><input data-dojo-type="dijit/form/ValidationTextBox" placeholder="usuario123" required="true"
+                        name="username" id="username">*</td>
+            </tr>
+            <tr>
+                <td><label><strong>Contraseña:</strong></label></td>
+                <td><input id="pass" type="password" data-dojo-type="dijit/form/ValidationTextBox"
+                        data-dojo-props="invalidMessage:'La contraseña debe tener entre 6 y 20 caracteres'"
+                        required="true" pattern=".{6,20}" />*</td>
+            </tr>
+            <tr>
+                <td><label><strong>Confirmar Contraseña:</strong></label></td>
+                <td><input id="passConf" type="password" data-dojo-type="dijit/form/ValidationTextBox" />*</td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="emailReg"><strong>Email:</strong></label>
+                </td>
+                <td>
+                    <input id="emailReg" name="emailReg" data-dojo-type="dijit/form/ValidationTextBox" required="true"
+                        placeholder="miMail@mail.com"
+                        data-dojo-props="validator:dojox.validate.isEmailAddress,
+                        invalidMessage:'Por favor, ingresá un E-mail válido. Es necesario que lo cargues para poder continuar con el registro.'">*
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="emailRegConf"><strong>Confirmar Email:</strong></label>
+                </td>
+                <td>
+                    <input id="emailRegConf" name="emailRegConf" data-dojo-type="dijit/form/ValidationTextBox"
+                        required="true" placeholder="miMail@mail.com" data-dojo-props="validator:dojox.validate.isEmailAddress,
+                        invalidMessage:'Los emails deben coincidir', missingMessage:'Los emails deben coincidir'">*
+                </td>
+            </tr>
+            <!-- OCULTAR O MOSTRAR ELEMENTOS EN EL FORMULARIO -->
+            <tr>
+                <td valign="top"><strong>¿Es empleado?: </strong></td>
+                <td>
+                    <input type="radio" id="employeeYes" name="employee" data-dojo-type="dijit/form/RadioButton"
+                        data-dojo-props="onClick:function(){
+                                dojo.query('#onlyEmployee').style('display', 'contents');
+                                document.querySelector('#employeeId').required = true;}" />
+                    <label for="radio1">Si</label>
+                    &nbsp;&nbsp;&nbsp;
+                    <input type="radio" id="employeeNo" name="employee" checked="checked"
+                        data-dojo-type="dijit/form/RadioButton" data-dojo-props="onClick:function(){
+                                dojo.query('#onlyEmployee').style('display', 'none');
+                                document.querySelector('#employeeId').required = false;}" />
+                    <label for="radio2">No</label>
+                </td>
+            </tr>
+            <tr id="onlyEmployee" style="display: none;">
+                <td><label for="employeeId"><strong>Id:</strong></label></td>
+                <td><input data-dojo-type="dijit/form/NumberTextBox" data-dojo-props="constraints:{min:1,max:2000000}, invalidMessage:'Por favor, ingresa un valor numerico.',
+                            rangeMessage:'Ingresa un valor mayor a 1 y menor a 2000000'" required="false"
+                        name="employeeId" id="employeeId">*</td>
+            </tr>
+
+        </table>
+        <p style="font-size: x-small;margin-top: 0.5em;margin-bottom: 0.5em;" class="text-center">
+            * indica campos obligatorios.
+        </p>
+    </fieldset>
+    <div class="dijitDialogPaneActionBar">
+        <button data-dojo-type="dijit/form/Button" type="submit" id="btnlogup" class="buttonRed">Registrar</button>
+        
+        <button data-dojo-type="dijit/form/Button" type="button" id="btncerrarlogin" class="buttonRed"
+        data-dojo-props="onClick:function(){myDialog.hide();dojo.query('#onlyEmployee').style('display', 'none');}">
+            Cerrar
+        </button>
+    </div>
+</div>

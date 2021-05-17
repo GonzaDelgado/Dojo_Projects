@@ -1,0 +1,42 @@
+<div data-dojo-type="dijit/form/Form" id="formLogin" data-dojo-id="formLogin" encType="multipart/form-data" action=""
+    method="post">
+
+    <script type="dojo/on" data-dojo-event="submit">
+                event.preventDefault();
+                let username = document.getElementById("usernamelog").value;
+                let password = document.getElementById("passlog").value;
+                let res = false;
+                if (this.validate()) {
+                    res = verificarLogin(username, password);
+                    myDialog.hide();
+                } else {
+                    alerta.show();
+                    res = false;
+                }
+                return res;
+            </script>
+
+    <fieldset style="border:inset 2px #769DC0">
+        <table class="dijitDialogPaneContentArea" cellpadding="10" style="margin-top: 0.5em;">
+            <tr>
+                <td><label for="usernamelog"><strong>Nombre de Usuario:</strong></label></td>
+                <td><input data-dojo-type="dijit/form/ValidationTextBox" required="true" name="usernamelog"
+                        id="usernamelog"></td>
+            </tr>
+            <tr>
+                <td><label><strong>Contraseña:</strong></label></td>
+                <td><input id="passlog" type="password" data-dojo-type="dijit/form/ValidationTextBox"
+                        data-dojo-props="invalidMessage:'Ingresa una contraseña'" required="true" /></td>
+            </tr>
+
+        </table>
+    </fieldset>
+    <div class="dijitDialogPaneActionBar">
+        <button data-dojo-type="dijit/form/Button" type="submit" id="btnefectivelogin" class="buttonRed">Iniciar
+            Sesión</button>
+        <button data-dojo-type="dijit/form/Button" type="button" id="btncerrarlogin" class="buttonRed"
+        data-dojo-props="onClick:function(){myDialog.hide();}">
+            Cerrar
+        </button>
+    </div>
+</div>

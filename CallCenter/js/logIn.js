@@ -15,7 +15,7 @@ function actualizarLogin() {
         //muestro el boton de cerrar sesion y el de consultar reclamo
         dojo.query('#btnlogout').style('display', 'inline');
         dojo.query('#consultarReclamo').style('display', 'contents');
-        dojo.query('.reclamo').style('display', 'inline');
+        dojo.query('#divConsultar').style('display', 'inline');
         //Veo si el usuario es empleado o no para mostrar el boton de añadir reclamo
         if(localStorage.getItem('employeeId') !== '0'){
             dojo.query('#btnagregar').style('display', 'inline');
@@ -30,7 +30,7 @@ function actualizarLogin() {
         //oculto el boton de consultar reclamo y el de agregar reclamo
         dojo.query('#btnagregar').style('display', 'none');
         dojo.query('#consultarReclamo').style('display', 'none');
-        dojo.query('.reclamo').style('display', 'none');
+        dojo.query('#divConsultar').style('display', 'none');
         //oculto el boton de cerrar sesion
         dojo.query('#btnlogout').style('display', 'none');
         //muestro los botones de iniciar sesion y registrarse
@@ -69,8 +69,6 @@ function verificarLogin(username, password) {
                 localStorage.employeeId = response[0].idEmployee;
                 actualizarLogin();
                 sesionIniciada.show();
-                login.reset();
-                login.hide();
                 res = true;
             }
         });

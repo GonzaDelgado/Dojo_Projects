@@ -6,6 +6,7 @@
     <title>Call Center</title>
     <link rel="stylesheet" href="../../demo.css" media="screen">
     <link rel="stylesheet" href="../../style.css" media="screen">
+    <link rel="icon" href="./images/hsbc_logo_icon_170012.ico" />
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/claro/claro.css"
         media="screen">
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/resources/dojo.css">
@@ -20,8 +21,10 @@
         /*Grid need a explicit width/height by default*/
 
         #tablaGrid {
-            width: 79em;
-            height: 64px;
+            max-width: 79em;
+            width: 100%;
+            max-height: 10em;
+            height: 100%;
         }
     </style>
 </head>
@@ -32,17 +35,62 @@
         data-dojo-props="design: 'headline'">
         <div class="centerPanel" data-dojo-type="dijit/layout/TabContainer"
             data-dojo-props="region: 'center', tabPosition: 'top'">
-            <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title: 'Buscar o añadir reclamo'">
+            <div data-dojo-type="dijit/layout/ContentPane" style="height: 100%;max-width: 1050px;width: 100%;"
+                data-dojo-props="title: 'Buscar o añadir reclamo'">
                 <div><button id="btnagregar" class="buttonRed">Añadir un reclamo</button></div>
                 <br>
-                <div class="text-center">
-                    <h3 id="consultarReclamo">Consultar Reclamo</h3>
-                    <br>
-                    <input class="reclamo" type="search" name="codigoReclamo" id="codigoReclamo">
+                <div id="divConsultar">
+                    <div class="text-center">
+                        <h2 id="consultarReclamo">Consultar Reclamo</h2>
+                        <br><br><br>
+                        <label>Buscar por:</label>
+                        <input type="radio" checked id="codigoradbtn" name="buscar"
+                            data-dojo-type="dijit/form/RadioButton" data-dojo-props="onClick:function(){
+                                dojo.query('#porTipo').style('display', 'none');
+                                dojo.query('#porEstado').style('display', 'none');
+                                dojo.query('#porCodigo').style('display', 'contents');
+                                dom.byId('estadoSCmbbox').value = '';
+                                dom.byId('tipoSCmbbox').value = '';}" />
+                        <label for="radio1">Código</label>
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="radio" id="estadoradbtn" name="buscar" data-dojo-type="dijit/form/RadioButton"
+                            data-dojo-props="onClick:function(){
+                                dojo.query('#porTipo').style('display', 'none');
+                                dojo.query('#porEstado').style('display', 'contents');
+                                dojo.query('#porCodigo').style('display', 'none');
+                                dom.byId('codigoReclamo').value = '';
+                                dom.byId('tipoSCmbbox').value = '';}" />
+                        <label for="radio1">Estado</label>
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="radio" id="tiporadbtn" name="buscar" data-dojo-type="dijit/form/RadioButton"
+                            data-dojo-props="onClick:function(){
+                                dojo.query('#porTipo').style('display', 'contents');
+                                dojo.query('#porEstado').style('display', 'none');
+                                dojo.query('#porCodigo').style('display', 'none');
+                                dom.byId('codigoReclamo').value = '';
+                                dom.byId('estadoSCmbbox').value = '';}" />
+                        <label for="radio1">Tipo</label>
+                        <br><br>
+                        <div id="porCodigo" class="reclamo">
+                            <label for="codigoReclamo"><strong>Código:</strong></label>
+                            <input data-dojo-type="dijit/form/NumberTextBox" data-dojo-props="constraints:{min:1,max:2000000}, invalidMessage:'Por favor, ingresa un valor numerico.',
+                        rangeMessage:'Ingresa un valor mayor a 1 y menor a 2000000'" style="padding: 1px 2px;"
+                                name="codigoReclamo" id="codigoReclamo" placeholder="Código">
+                        </div>
+                        <div id="porEstado" style="display: none;">
+                            <label for="estadoSearch"><strong>Estado:</strong></label>
+                            <input id="estadoSearch" name="estadoSelect" />
+                        </div>
+                        <div id="porTipo" style="display: none;">
+                            <label for="tipoSearch"><strong>Tipo:</strong></label>
+                            <input id="tipoSearch" name="tipoSelect" />
+                        </div>
 
-                    <br><br>
-                    <button class="reclamo" id="btnbuscar"
-                        style="background-color: #ff9a9a;border: 1px solid #c07676;">Buscar</button>
+
+                        <br><br>
+                        <button class="reclamo" id="btnbuscar"
+                            style="background-color: #ff9a9a;border: 1px solid #c07676;">Buscar</button>
+                    </div>
                 </div>
                 <br>
                 <div class="grid">
@@ -53,7 +101,10 @@
 
         <div class="edgePanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'"
             style="background-color: rgb(255, 255, 255);">
+            <!-- div de bienvenida -->
+
             <div id="bienvenido" class="text-right" style="font-size: 1.5em"></div>
+
             <img src="https://www.hsbc.com.ar/content/dam/hsbc/hbar/images/index/HSBC_MASTERBRAND_LOGO_RGB.svg"
                 alt="HSBC logo" WIDTH="160" HEIGHT="70">
             <div style="text-align: right;">
@@ -78,235 +129,19 @@
     <script src="js/logIn.js"></script>
     <script src="js/logUp.js"></script>
     <script src="js/app.js"></script>
-    
+    <script src="js/dialogs.js"></script>
+
+    <!-- Script para rellenar estados y tipos -->
+    <script src="js/setOptions.js"></script>
 
     <!-- Formulario para agregar reclamo -->
-
-    <div data-dojo-type="dijit/Dialog" data-dojo-id="myDialog" title="Agregar Reclamo" style="width: 50%;"
-        class="text-center">
-        <form method="POST" id="myForm">
-            <table class="dijitDialogPaneContentArea">
-                <tr>
-                    <td><label for="nombreyApellido">Nombre y Apellido:</label></td>
-                    <td><input data-dojo-type="dijit/form/ValidationTextBox" placeholder="nombre apellido"
-                            data-dojo-props="missingMessage:'Campo obligatorio!'" required="true" name="nombreyApellido"
-                            id="nombreyApellido">*
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="estado">Estado:</label></td>
-                    <td><select data-dojo-type="dijit/form/ComboBox" placeholder="--Selecciona--"
-                            data-dojo-props="missingMessage:'Campo obligatorio!'" id="estado" name="estado"
-                            required="true">
-                            <option selected></option>
-                            <option>Por iniciar</option>
-                            <option>En Proceso</option>
-                            <option>Derivado a Service</option>
-                            <option>En Espera</option>
-                        </select>*</td>
-                </tr>
-                <tr>
-                    <td><label for="tipo">Tipo:</label></td>
-                    <td><select data-dojo-type="dijit/form/ComboBox" placeholder="--Selecciona--"
-                            data-dojo-props="missingMessage:'Campo obligatorio!'" id="tipo" name="tipo" required="true">
-                            <option selected></option>
-                            <option>Homebanking</option>
-                            <option>Finanzas</option>
-                            <option>Beneficios</option>
-                            <option>Tarjeta de Crédito</option>
-                        </select>*</td>
-                </tr>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="email">Email:</label>
-                    </td>
-                    <td>
-                        <input id="email" name="email" data-dojo-type="dijit/form/ValidationTextBox" required="true"
-                            placeholder="miMail@mail.com" data-dojo-props="invalidMessage:'Por favor, ingresá un E-mail válido. Es necesario que lo cargues para poder continuar con la solicitud.',
-                        missingMessage:'Campo obligatorio!'">*
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="confirmarEmail">Confirmar Email:</label>
-                    </td>
-                    <td>
-                        <input id="confirmarEmail" name="confirmarEmail" data-dojo-type="dijit/form/ValidationTextBox"
-                            required="true" data-dojo-props="invalidMessage:'Los emails deben coincidir!',
-                        missingMessage:'Campo obligatorio!'">*
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="descripcion">Descripcion:</label>
-                    </td>
-                    <td>
-                        <input id="descripcion" name="descripcion" data-dojo-type="dijit/form/SimpleTextarea"
-                            maxlength="100">
-                    </td>
-                </tr>
-            </table>
-
-            <div class="dijitDialogPaneActionBar">
-                <input type="submit" value="Enviar" class="buttonRed">
-                <div data-dojo-type="dijit/form/Button" type="button" id="btncancelar" class="buttonRed">
-                    <script type="dojo/on" data-dojo-event="click">
-                        myDialog.hide();
-                        myDialog.reset();
-                    </script>
-                    Cancelar
-                </div>
-            </div>
-    </div>
-    </div>
-    </form>
-
-    </div>
+    <div id="agregarReclamo"></div>
 
     <!-- FORMULARIO DE REGISTRO -->
+    <div id="registerForm"></div>
 
-    <div data-dojo-type="dijit/Dialog" data-dojo-id="registro" title="Registrar Usuario" style="width: 50%;"
-        class="text-center">
-        <div data-dojo-type="dijit/form/Form" id="formRegistro" data-dojo-id="formRegistro"
-            encType="multipart/form-data" action="" method="post">
-
-            <script type="dojo/on" data-dojo-event="submit">
-                event.preventDefault();
-                let res = verificarRegistro(this);
-                return res;
-            </script>
-
-            <fieldset style="border:inset 2px #769DC0">
-                <table class="dijitDialogPaneContentArea" cellpadding="10" style="margin-top: 0.5em;">
-                    <tr>
-                        <td><label for="username"><strong>Nombre de Usuario:</strong></label></td>
-                        <td><input data-dojo-type="dijit/form/ValidationTextBox" placeholder="usuario123"
-                                required="true" name="username" id="username">*</td>
-                    </tr>
-                    <tr>
-                        <td><label><strong>Contraseña:</strong></label></td>
-                        <td><input id="pass" type="password" data-dojo-type="dijit/form/ValidationTextBox"
-                                data-dojo-props="invalidMessage:'La contraseña debe tener entre 6 y 20 caracteres'"
-                                required="true" pattern=".{6,20}" />*</td>
-                    </tr>
-                    <tr>
-                        <td><label><strong>Confirmar Contraseña:</strong></label></td>
-                        <td><input id="passConf" type="password" data-dojo-type="dijit/form/ValidationTextBox" />*</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="emailReg"><strong>Email:</strong></label>
-                        </td>
-                        <td>
-                            <input id="emailReg" name="emailReg" data-dojo-type="dijit/form/ValidationTextBox"
-                                required="true" placeholder="miMail@mail.com"
-                                data-dojo-props="validator:dojox.validate.isEmailAddress,
-                        invalidMessage:'Por favor, ingresá un E-mail válido. Es necesario que lo cargues para poder continuar con el registro.'">*
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="emailRegConf"><strong>Confirmar Email:</strong></label>
-                        </td>
-                        <td>
-                            <input id="emailRegConf" name="emailRegConf" data-dojo-type="dijit/form/ValidationTextBox"
-                                required="true" placeholder="miMail@mail.com" data-dojo-props="validator:dojox.validate.isEmailAddress,
-                        invalidMessage:'Los emails deben coincidir', missingMessage:'Los emails deben coincidir'">*
-                        </td>
-                    </tr>
-                    <!-- OCULTAR O MOSTRAR ELEMENTOS EN EL FORMULARIO -->
-                    <tr>
-                        <td valign="top"><strong>¿Es empleado?: </strong></td>
-                        <td>
-                            <input type="radio" id="employeeYes" name="employee" data-dojo-type="dijit/form/RadioButton"
-                                data-dojo-props="onClick:function(){
-                                dojo.query('#onlyEmployee').style('display', 'contents');
-                                document.querySelector('#employeeId').required = true;}" />
-                            <label for="radio1">Si</label>
-                            &nbsp;&nbsp;&nbsp;
-                            <input type="radio" id="employeeNo" name="employee" checked="checked"
-                                data-dojo-type="dijit/form/RadioButton" data-dojo-props="onClick:function(){
-                                dojo.query('#onlyEmployee').style('display', 'none');
-                                document.querySelector('#employeeId').required = false;}" />
-                            <label for="radio2">No</label>
-                        </td>
-                    </tr>
-                    <tr id="onlyEmployee" style="display: none;">
-                        <td><label for="employeeId"><strong>Id:</strong></label></td>
-                        <td><input data-dojo-type="dijit/form/NumberTextBox" data-dojo-props="constraints:{min:1,max:2000000}, invalidMessage:'Por favor, ingresa un valor numerico.',
-                            rangeMessage:'Ingresa un valor mayor a 1 y menor a 2000000'" required="false" name="employeeId"
-                                id="employeeId">*</td>
-                    </tr>
-
-                </table>
-                <p style="font-size: x-small;margin-top: 0.5em;margin-bottom: 0.5em;" class="text-center">
-                    * indica campos obligatorios.
-                </p>
-            </fieldset>
-            <div class="dijitDialogPaneActionBar">
-                <button data-dojo-type="dijit/form/Button" type="submit" id="btnlogup"
-                    class="buttonRed">Registrar</button>
-                <div data-dojo-type="dijit/form/Button" type="button" id="btncerrar" class="buttonRed">
-                    <script type="dojo/on" data-dojo-event="click">
-                        registro.hide();
-                        dojo.query('#onlyEmployee').style('display', 'none');
-                        registro.reset();
-                    </script>
-                    Cerrar
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- Formulario de inicio de sesión -->
-
-    <div data-dojo-type="dijit/Dialog" data-dojo-id="login" title="Iniciar Sesión" style="width: 50%;"
-        class="text-center">
-        <div data-dojo-type="dijit/form/Form" id="formLogin" data-dojo-id="formLogin" encType="multipart/form-data"
-            action="" method="post">
-
-            <script type="dojo/on" data-dojo-event="submit">
-                event.preventDefault();
-                let username = document.getElementById("usernamelog").value;
-                let password = document.getElementById("passlog").value;
-                let res = false;
-                if (this.validate()) {
-                    res = verificarLogin(username, password);
-                } else {
-                    alerta.show();
-                    res = false;
-                }
-                return res;
-            </script>
-
-            <fieldset style="border:inset 2px #769DC0">
-                <table class="dijitDialogPaneContentArea" cellpadding="10" style="margin-top: 0.5em;">
-                    <tr>
-                        <td><label for="usernamelog"><strong>Nombre de Usuario:</strong></label></td>
-                        <td><input data-dojo-type="dijit/form/ValidationTextBox" required="true" name="usernamelog"
-                                id="usernamelog"></td>
-                    </tr>
-                    <tr>
-                        <td><label><strong>Contraseña:</strong></label></td>
-                        <td><input id="passlog" type="password" data-dojo-type="dijit/form/ValidationTextBox"
-                                data-dojo-props="invalidMessage:'Ingresa una contraseña'" required="true" /></td>
-                    </tr>
-
-                </table>
-            </fieldset>
-            <div class="dijitDialogPaneActionBar">
-                <button data-dojo-type="dijit/form/Button" type="submit" id="btnefectivelogin" class="buttonRed">Iniciar
-                    Sesión</button>
-                <div data-dojo-type="dijit/form/Button" type="button" id="btncerrarlogin" class="buttonRed">
-                    <script type="dojo/on" data-dojo-event="click">
-                        login.hide();
-                        login.reset();
-                    </script>
-                    Cerrar
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="divLogin"></div>
 
     <!-- Popups -->
     <div data-dojo-type="dijit/Dialog" data-dojo-id="alerta" title="Datos invalidos">
@@ -388,11 +223,10 @@
     </div>
     <div data-dojo-type="dijit/Dialog" data-dojo-id="camposInvalidos" id="camposInvalidos" title="Campos invalidos">
         <div class="dijitDialogPaneActionBar" id="camposInvalidosBtnPanel">
-            <button data-dojo-type="dijit/form/Button" type="button" onClick="camposInvalidos.hide();" id="cerrarCamposInv"
-                class="buttonRed">Ok</button>
+            <button data-dojo-type="dijit/form/Button" type="button" onClick="camposInvalidos.hide();"
+                id="cerrarCamposInv" class="buttonRed">Ok</button>
         </div>
     </div>
-    <script src="js/submit.js"></script>
     <!-- load jquery for gif of load -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script type="text/javascript">

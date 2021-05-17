@@ -2,8 +2,7 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
     "dojo/on", "dojo/request", "dojo/dom-construct", "dojo/dom-attr",
     "dojox/grid/enhanced/plugins/Pagination", "dijit/form/Textarea", 'dojox/validate/web', 'dojox/form/PasswordValidator', 'dijit/Dialog', 'dojo/domReady!'],
 
-    function (EnhancedGrid, ItemFileWriteStore, dom, on, request, domConstruct, domAttr,
-        Pagination, Textarea, validate, PasswordValidator, Dialog) {
+    function (EnhancedGrid, ItemFileWriteStore, dom, on, request) {
 
         const url = "https://60870b4fa3b9c200173b7792.mockapi.io/Reclamos/";
         let botonBuscar = dom.byId("btnbuscar");
@@ -64,12 +63,17 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
                     position: "bottom",
                     sizeSwitch: false,
                     gotoButton: true,
-                    defaultPageSize: 5,
+                    defaultPageSize: 20,
                 },
             },
+            position: 'relative',
+            autoWidth: true,
+            loadingMessage: 'Cargando...',
+            bordercollapse: 'collapse',
+            autoHeight: true,
             editable: true,
             structure: layout,
-            rowSelector: '10px'
+            rowSelector: '50px'
         },
             document.createElement('div'));
 
@@ -79,24 +83,48 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
         /*Call startup() to render the grid*/
         grid.startup();
 
-        function searchReclamo() {
-            var codigoReclamo = dom.byId("codigoReclamo").value;
-            request.get(url + codigoReclamo, {
+        function searchReclamo(value) {
+            let urlFinal;
+            if(typeof value == 'string'){
+                urlFinal = url + '?search=' + value;
+            } else{
+                value = value + ""; 
+                urlFinal = url + value;
+            }
+            request.get(urlFinal, {
                 handleAs: "json"
             })
                 .then(
                     function (res) {
-                        const registro = {
-                            Codigo: res.Codigo,
-                            Fecha: res.Fecha_De_Inicio,
-                            Estado: res.Estado,
-                            Nombre: res.NombreyApellido,
-                            Tipo: res.Tipo,
-                            Descripcion: res.Descripcion,
-                            Email: res.Email,
-                        };
-                        registros.pop();
-                        registros.push(registro);
+                        var temp = res;
+                        if(res.length > 1){
+                            registros = [];
+                            res.forEach(function(r) {
+                                const registro = {
+                                    Codigo: r.Codigo,
+                                    Fecha: r.Fecha_De_Inicio,
+                                    Estado: r.Estado,
+                                    Nombre: r.NombreyApellido,
+                                    Tipo: r.Tipo,
+                                    Descripcion: r.Descripcion,
+                                    Email: r.Email,
+                                };
+                                registros.push(registro);
+                                grid.resize({ w: 400, h: 400 });
+                            });
+                        } else{
+                            const registro = {
+                                Codigo: res.Codigo,
+                                Fecha: res.Fecha_De_Inicio,
+                                Estado: res.Estado,
+                                Nombre: res.NombreyApellido,
+                                Tipo: res.Tipo,
+                                Descripcion: res.Descripcion,
+                                Email: res.Email,
+                            };
+                            registros.pop();
+                            registros.push(registro);
+                        }
                         refreshGrid(registros);
                     })
 
@@ -120,7 +148,19 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
           y al de presionar la tecla ENTER*/
         on(btnbuscar, "click", function (event) {
             dojo.query('#tablaGrid').style('display', 'block');
-            searchReclamo();
+            var codigoReclamo = dom.byId("codigoReclamo").value;
+            var tipo = dom.byId("tipoSCmbbox").value;
+            var estado = dom.byId("estadoSCmbbox").value;
+            if(codigoReclamo !== ""){
+                let codigo = parseInt(codigoReclamo);
+                searchReclamo(codigo);
+            }
+            if(tipo !== ""){
+                searchReclamo(tipo);
+            }
+            if(estado !== ""){
+                searchReclamo(estado);
+            }
             var data = {
                 identifier: 'id',
                 items: registros
@@ -149,13 +189,18 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
         });
         /*hago visible el formulario cuando apreto en añadir un reclamo*/
         on(botonAgregar, "click", function (event) {
-            myDialog.show();
+            crearDialogo("agregarReclamo","Agregar Reclamo","myDialog","./html/DialogAddReclamo.html");
+            setOptions(`https://60870b4fa3b9c200173b7792.mockapi.io/Estados`,"estadoCmbbox", "estados", "estado");
+            setOptions(`https://60870b4fa3b9c200173b7792.mockapi.io/Tipo`,"tipoCmbbox", "tipos", "tipo");
+            //myDialog.show();
         });
         on(botonRegistrar, "click", function (event) {
-            registro.show();
+            crearDialogo("registerForm","Registrar Usuario","registro","./html/DialogLogUp.html");
+            //registro.show();
         });
         on(botonLogin, "click", function (event) {
-            login.show();
+            crearDialogo("divLogin","Iniciar Sesión","login","./html/DialogLogIn.html");
+            //login.show();
         });
         on(botonLogout, "click", function (event) {
             cerrarSesion.show();

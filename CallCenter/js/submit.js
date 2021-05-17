@@ -40,11 +40,11 @@ require(["dojo/_base/array", "dojo/_base/event", "dojo/query", "dojox/validate/w
         //	wait until after our requires are actually loaded.
         profile = {
             trim: ["nombreyApellido"],
-            required: ["nombreyApellido", "estado", "tipo", "email", "confirmarEmail"],
+            required: ["nombreyApellido", "estadoCmbbox", "tipoCmbbox", "email", "confirmarEmail"],
             constraints: {
                 nombreyApellido: validate.isText,
-                estado: validate.isText,
-                tipo: validate.isText,
+                estadoCmbbox: validate.isText,
+                tipoCmbbox: validate.isText,
                 email: [validate.isEmailAddress, false, true],
                 confirmarEmail: [validate.isEmailAddress, false, true]
             },
@@ -62,9 +62,9 @@ require(["dojo/_base/array", "dojo/_base/event", "dojo/query", "dojox/validate/w
     });
 function agregarReclamo() {
     const data = {
-        'Estado': document.getElementById("estado").value,
-        'NombreyApellido': document.getElementById("name").value,
-        'Tipo': document.getElementById("tipo").value,
+        'Estado': document.getElementById("estadoCmbbox").value,
+        'NombreyApellido': document.getElementById("nombreyApellido").value,
+        'Tipo': document.getElementById("tipoCmbbox").value,
         'Descripcion': document.getElementById("descripcion").value,
         'Email': document.getElementById("email").value
     };
