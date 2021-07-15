@@ -1,61 +1,64 @@
-<div id="myForm" data-dojo-type="dijit/form/Form">
-    <script type="dojo/on" data-dojo-event="submit">
-        event.preventDefault();
-        let res = validar(this);
-        return res;
-    </script>
-    <div class="container">
-            <div class="form-group row">
-                <label for="nombreyApellido" class="col-sm-4 col-form-label">*Nombre y Apellido:</label>
-                <div class="col-sm-8">
-                <input class="form-control" data-dojo-type="dijit/form/ValidationTextBox" placeholder="nombre apellido"
-                        data-dojo-props="missingMessage:'Campo obligatorio!'" required="true" name="Nombre y Apellido"
-                        id="nombreyApellido">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="estado" class="col-sm-4 col-form-label">*Estado:</label>
-                <div class="col-sm-8">
-                    <input id="estado" style="visibility: hidden;" name="estadoSelect" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="tipo" class="col-sm-4 col-form-label">*Tipo:</label>
-                <div class="col-sm-8">
-                    <input id="tipo"style="visibility: hidden;" name="tipoSelect" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="email" class="col-sm-4 col-form-label">*Email:</label>
-                <div class="col-sm-8">
-                    <input id="email" name="Email" class="form-control" data-dojo-type="dijit/form/ValidationTextBox" required="true"
-                        placeholder="miMail@mail.com" data-dojo-props="invalidMessage:'Por favor, ingresá un E-mail válido. Es necesario que lo cargues para poder continuar con la solicitud.',
-                missingMessage:'Campo obligatorio!'">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="confirmarEmail" class="col-sm-4 col-form-label">*Confirmar Email:</label>
-                <div class="col-sm-8">
-                    <input id="confirmarEmail" name="confirmarEmail" class="form-control" data-dojo-type="dijit/form/ValidationTextBox"
-                        required="true" data-dojo-props="invalidMessage:'Los emails deben coincidir!',
-                missingMessage:'Campo obligatorio!'">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="descripcion" class="col-sm-4 col-form-label">Descripcion:</label>
-                <div class="col-sm-8">
-                    <input id="descripcion" name="descripcion" class="form-control" data-dojo-type="dijit/form/SimpleTextarea"
-                        maxlength="100">
-                </div>
-            </div>
-    </div>
+<form method="POST" id="myForm">
+    <table class="dijitDialogPaneContentArea">
+        <tr>
+            <td><label for="nombreyApellido">Nombre y Apellido:</label></td>
+            <td><input data-dojo-type="dijit/form/ValidationTextBox" placeholder="nombre apellido"
+                    data-dojo-props="missingMessage:'Campo obligatorio!'" required="true" name="nombreyApellido"
+                    id="nombreyApellido">*
+            </td>
+        </tr>
+        <tr>
+            <td><label for="estado">Estado:</label></td>
+            <td>
+                <input id="estado" style="visibility: hidden;" name="estadoSelect" />*
+            </td>
+        </tr>
+        <tr>
+            <td><label for="tipo">Tipo:</label></td>
+            <td>
+                <input id="tipo" style="visibility: hidden;" name="tipoSelect" />*
+            </td>
+        </tr>
+        </tr>
+        <tr>
+            <td>
+                <label for="email">Email:</label>
+            </td>
+            <td>
+                <input id="email" name="email" data-dojo-type="dijit/form/ValidationTextBox" required="true"
+                    placeholder="miMail@mail.com" data-dojo-props="invalidMessage:'Por favor, ingresá un E-mail válido. Es necesario que lo cargues para poder continuar con la solicitud.',
+                missingMessage:'Campo obligatorio!'">*
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="confirmarEmail">Confirmar Email:</label>
+            </td>
+            <td>
+                <input id="confirmarEmail" name="confirmarEmail" data-dojo-type="dijit/form/ValidationTextBox"
+                    required="true" data-dojo-props="invalidMessage:'Los emails deben coincidir!',
+                missingMessage:'Campo obligatorio!'">*
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="descripcion">Descripcion:</label>
+            </td>
+            <td>
+                <input id="descripcion" name="descripcion" data-dojo-type="dijit/form/SimpleTextarea"
+                    maxlength="100">
+            </td>
+        </tr>
+    </table>
 
     <div class="dijitDialogPaneActionBar">
-        <button id="btnEnviar" type="submit" class="btn btn-success btn-lg">
-            Enviar</button>
-        <button data-dojo-type="dijit/form/Button" type="button" class="btn btn-danger btn-sm"
-            data-dojo-props="onClick:function(){myDialog.hide();}">
+        <input type="submit" value="Enviar" class="buttonRed">
+        <button data-dojo-type="dijit/form/Button" type="button" class="buttonRed" 
+        data-dojo-props="onClick:function(){myDialog.hide();}">
             Cancelar
         </button>
     </div>
 </div>
+</div>
+</form>
+<script src="js/submit.js"></script>

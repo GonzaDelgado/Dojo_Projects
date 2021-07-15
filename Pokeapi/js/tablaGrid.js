@@ -61,8 +61,6 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
                     defaultPageSize: 5,
                 },
             },
-            autoWidth: true,
-            autoHeight: true,
             editable: true,
             structure: layout,
             rowSelector: '20px'
