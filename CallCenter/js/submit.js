@@ -1,4 +1,4 @@
-require(["dojo/_base/array", "dojo/_base/event", "dojo/query", "dojox/validate/web", "dojox/validate/us", "dojox/validate/check", "dojo/domReady!"],
+/*require(["dojo/_base/array", "dojo/_base/event", "dojo/query", "dojox/validate/web", "dojox/validate/us", "dojox/validate/check", "dojo/domReady!"],
     function (arrayUtil, baseEvent, query, validate) {
 
         function doCheck(form) {
@@ -54,12 +54,84 @@ require(["dojo/_base/array", "dojo/_base/event", "dojo/query", "dojox/validate/w
         };
 
         //	set up the form handler.
+
         var f = query("#myForm")[0];
         f.onsubmit = function (e) {
             baseEvent.stop(e);
             doCheck(f);
         };
+    });*/
+/*   
+require(["dojo/domReady!"],function() {
+   var f = $('#myForm');
+   f.onsubmit = function (e) {
+       baseEvent.stop(e);
+       doCheck(f);
+   };
+});*/
+
+function validar(form) {
+    let nombreyApellido = document.getElementById("nombreyApellido").value;
+    let estadoCmbbox = document.getElementById("estadoCmbbox").value;
+    let tipoCmbbox = document.getElementById("tipoCmbbox").value;
+    let email = document.getElementById("email").value;
+    let confirmarEmail = document.getElementById("confirmarEmail").value;
+    let campos = [nombreyApellido, estadoCmbbox, tipoCmbbox, email];
+    let res = false;
+    if (email != confirmarEmail) {
+        emailAlert.show();
+        return false;
+    }
+    if (form.validate()) {
+        agregarReclamo();
+        res = true;
+    } else {
+        let inv = invalidos(campos);
+        let mensaje = msjInvalidos(inv);
+        mostrarInvalidos(mensaje);
+        res = false;
+    }
+    return res;
+}
+
+function invalidos(array) {
+    let res = [];
+    require(["dojox/validate/web"], function (validate) {
+        if (!validate.isText(array[0])) {
+            res.push('nombreyApellido');
+        }
+        if (!validate.isText(array[1])) {
+            res.push('estadoCmbbox');
+        }
+        if (!validate.isText(array[2])) {
+            res.push('tipoCmbbox');
+        }
+        if (!validate.isEmailAddress(array[3], false, true)) {
+            res.push('email');
+        }
     });
+    return res;
+}
+
+function msjInvalidos(campos) {
+    let html = "<h4>Los siguientes campos son invalidos</h4><br/>";
+
+    campos.forEach(element => {
+        let nombre = $('#' + element).attr('id');
+        html += `<p>${nombre}</p>`
+    });
+    return html;
+}
+
+function mostrarInvalidos(mensaje) {
+    var buttonCerrar = `<div class="dijitDialogPaneActionBar" id="camposInvalidosBtnPanel">
+                        <button data-dojo-type="dijit/form/Button" type="button" onClick="camposInvalidos.hide();" id="cerrarCamposInv"
+                        class="buttonRed">Ok</button>
+                        </div>`;
+    camposInvalidos.set("content", mensaje + buttonCerrar);
+    camposInvalidos.show();
+}
+
 function agregarReclamo() {
     const data = {
         'Estado': document.getElementById("estadoCmbbox").value,
@@ -78,6 +150,5 @@ function agregarReclamo() {
         });
     });
     exito.show();
-    myDialog.reset();
     myDialog.hide();
 }

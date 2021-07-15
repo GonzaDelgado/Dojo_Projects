@@ -1,8 +1,8 @@
-require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
-    "dojo/on", "dojo/request", "dojo/dom-construct", "dojo/dom-attr",
-    "dojox/grid/enhanced/plugins/Pagination", "dijit/form/Textarea", 'dojox/validate/web', 'dojox/form/PasswordValidator', 'dijit/Dialog', 'dojo/domReady!'],
+require(['dijit/registry', 'dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
+    "dojo/on", "dojo/request", "dojox/grid/enhanced/plugins/Pagination", "dijit/form/Textarea", 
+    'dojox/validate/web', 'dojox/form/PasswordValidator', 'dijit/Dialog', 'dojo/domReady!'],
 
-    function (EnhancedGrid, ItemFileWriteStore, dom, on, request) {
+    function (registry, EnhancedGrid, ItemFileWriteStore, dom, on, request) {
 
         const url = "https://60870b4fa3b9c200173b7792.mockapi.io/Reclamos/";
         let botonBuscar = dom.byId("btnbuscar");
@@ -20,7 +20,7 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             [{
                 'name': 'Código',
                 'field': 'Codigo',
-                width: "75px"
+                width: "44px"
             }, {
                 'name': 'Fecha',
                 'field': 'Fecha',
@@ -28,7 +28,7 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             }, {
                 'name': 'Estado',
                 'field': 'Estado',
-                width: "105px"
+                width: "125px"
             }, {
                 'name': 'Nombre Completo',
                 'field': 'Nombre',
@@ -45,12 +45,12 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             }, {
                 'name': 'Email',
                 'field': 'Email',
-                width: "190px"
+                width: "195px"
             }]
         ];
         /*set up data store*/
         var data = {
-            identifier: 'id',
+            identifier: 'Codigo',
             items: registros,
         };
         let store = new ItemFileWriteStore({ data: data });
@@ -58,22 +58,13 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
         var grid = new EnhancedGrid({
             id: 'grid',
             store: store,
-            plugins: {
-                pagination: {
-                    position: "bottom",
-                    sizeSwitch: false,
-                    gotoButton: true,
-                    defaultPageSize: 20,
-                },
-            },
-            position: 'relative',
             autoWidth: true,
-            loadingMessage: 'Cargando...',
-            bordercollapse: 'collapse',
-            autoHeight: true,
-            editable: true,
+            //autoHeight: true,
+            //width: '1000px',
+            margin: 'auto',
+            height: '400px',
             structure: layout,
-            rowSelector: '50px'
+            rowSelector: '8px'
         },
             document.createElement('div'));
 
@@ -96,7 +87,6 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             })
                 .then(
                     function (res) {
-                        var temp = res;
                         if(res.length > 1){
                             registros = [];
                             res.forEach(function(r) {
@@ -110,9 +100,9 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
                                     Email: r.Email,
                                 };
                                 registros.push(registro);
-                                grid.resize({ w: 400, h: 400 });
                             });
                         } else{
+                            registros = [];
                             const registro = {
                                 Codigo: res.Codigo,
                                 Fecha: res.Fecha_De_Inicio,
@@ -122,7 +112,6 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
                                 Descripcion: res.Descripcion,
                                 Email: res.Email,
                             };
-                            registros.pop();
                             registros.push(registro);
                         }
                         refreshGrid(registros);
@@ -135,18 +124,15 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
                 items: registros
             };
             let store = new ItemFileWriteStore({ data: data });
+            //grid.destroy();
             grid.store = store;
             grid.render();
         }
-        /*dialogo campos invalidos
-        var dialogCampos = new Dialog({
-            id: 'camposInvalidos',
-            title: 'Campos invalidos'
-        });*/
 
         /*Asigno la funcion de buscar reclamo al evento de presionar el boton de buscar
           y al de presionar la tecla ENTER*/
-        on(btnbuscar, "click", function (event) {
+        on(btnbuscar, "click", function (e) {
+            var tab = registry.byId("tabContainer");
             dojo.query('#tablaGrid').style('display', 'block');
             var codigoReclamo = dom.byId("codigoReclamo").value;
             var tipo = dom.byId("tipoSCmbbox").value;
@@ -154,44 +140,44 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
             if(codigoReclamo !== ""){
                 let codigo = parseInt(codigoReclamo);
                 searchReclamo(codigo);
+                dojo.query('#resultados').style('display', 'content');
             }
             if(tipo !== ""){
                 searchReclamo(tipo);
+                dojo.query('#resultados').style('display', 'content');
             }
             if(estado !== ""){
                 searchReclamo(estado);
+                dojo.query('#resultados').style('display', 'content');
             }
-            var data = {
-                identifier: 'id',
-                items: registros
-            };
-            let store = new ItemFileWriteStore({ data: data });
-            grid.store = store;
-            grid.render();
+            tab.selectChild(registry.byId("resultContainer"));
         });
         var ENTER = 13;
         on(document, "keyup", function (event) {
             if (event.keyCode == ENTER) {
+                var tab = registry.byId("tabContainer");
+                dojo.query('#tablaGrid').style('display', 'block');
                 var codigo = dom.byId("codigoReclamo").value;
+                var tipo = dom.byId("tipoSCmbbox").value;
+                var estado = dom.byId("estadoSCmbbox").value;
                 if (codigo != "") {
-                    dojo.query('#tablaGrid').style('display', 'block');
-                    searchReclamo();
-                    var data = {
-                        identifier: 'id',
-                        items: registros
-                    };
-                    let store = new ItemFileWriteStore({ data: data });
-                    grid.store = store;
-                    grid.render();
+                    let cod = parseInt(codigo);
+                    searchReclamo(cod);
                 }
-
+                if(tipo !== ""){
+                    searchReclamo(tipo);
+                }
+                if(estado !== ""){
+                    searchReclamo(estado);
+                }
+                tab.selectChild(registry.byId("resultContainer"));
             }
         });
         /*hago visible el formulario cuando apreto en añadir un reclamo*/
         on(botonAgregar, "click", function (event) {
             crearDialogo("agregarReclamo","Agregar Reclamo","myDialog","./html/DialogAddReclamo.html");
-            setOptions(`https://60870b4fa3b9c200173b7792.mockapi.io/Estados`,"estadoCmbbox", "estados", "estado");
-            setOptions(`https://60870b4fa3b9c200173b7792.mockapi.io/Tipo`,"tipoCmbbox", "tipos", "tipo");
+            setOptions(`https://60870b4fa3b9c200173b7792.mockapi.io/Estados`,"estadoCmbbox", "estados", "estado","form-control");
+            setOptions(`https://60870b4fa3b9c200173b7792.mockapi.io/Tipo`,"tipoCmbbox", "tipos", "tipo","form-control");
             //myDialog.show();
         });
         on(botonRegistrar, "click", function (event) {
@@ -205,8 +191,5 @@ require(['dojox/grid/EnhancedGrid', 'dojo/data/ItemFileWriteStore', 'dojo/dom',
         on(botonLogout, "click", function (event) {
             cerrarSesion.show();
         });
-        /*on(dom.byId("cerrarCamposInv"), "click", function(evt){
-            camposInvalidos.hide();
-        });*/
     }
 );

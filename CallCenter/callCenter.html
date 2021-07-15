@@ -5,26 +5,26 @@
     <meta charset="utf-8">
     <title>Call Center</title>
     <link rel="stylesheet" href="../../demo.css" media="screen">
-    <link rel="stylesheet" href="../../style.css" media="screen">
     <link rel="icon" href="./images/hsbc_logo_icon_170012.ico" />
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/claro/claro.css"
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.11/dijit/themes/claro/claro.css"
         media="screen">
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/resources/dojo.css">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.11/dojo/resources/dojo.css">
     <link rel="stylesheet"
-        href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/claro/EnhancedGrid.css">
+        href="//ajax.googleapis.com/ajax/libs/dojo/1.9.11/dojox/grid/enhanced/resources/claro/EnhancedGrid.css">
     <link rel="stylesheet"
-        href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojox/grid/enhanced/resources/EnhancedGrid_rtl.css">
-
-    <!-- load dojo and provide config via data attribute -->
+        href="//ajax.googleapis.com/ajax/libs/dojo/1.9.11/dojox/grid/enhanced/resources/EnhancedGrid_rtl.css">
+    <link rel="stylesheet" href="../../style.css" media="screen">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/site.css">
+    <!-- load dojo and jQuery-->
     <script src="../../dojo/dojo.js" data-dojo-config="async: 1, parseOnLoad: 1"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
     <style type="text/css">
         /*Grid need a explicit width/height by default*/
-
         #tablaGrid {
             max-width: 79em;
             width: 100%;
-            max-height: 10em;
-            height: 100%;
+            max-height: 400px;
         }
     </style>
 </head>
@@ -33,15 +33,15 @@
     <div class="loader"></div>
     <div id="appLayout" class="demoLayout" data-dojo-type="dijit/layout/BorderContainer"
         data-dojo-props="design: 'headline'">
-        <div class="centerPanel" data-dojo-type="dijit/layout/TabContainer"
-            data-dojo-props="region: 'center', tabPosition: 'top'">
-            <div data-dojo-type="dijit/layout/ContentPane" style="height: 100%;max-width: 1050px;width: 100%;"
+        <div id="tabContainer" class="centerPanel" data-dojo-type="dijit/layout/TabContainer"
+            data-dojo-props="region: 'center', tabPosition: 'top'" style="width: 1000px; height: 1000px; margin: 5px;">
+            <div id="buscarContainer" data-dojo-type="dijit/layout/ContentPane" style="height: 100%;max-width: 1050px;width: 100%;"
                 data-dojo-props="title: 'Buscar o añadir reclamo'">
                 <div><button id="btnagregar" class="buttonRed">Añadir un reclamo</button></div>
                 <br>
                 <div id="divConsultar">
                     <div class="text-center">
-                        <h2 id="consultarReclamo">Consultar Reclamo</h2>
+                        <h2 class="display-6" id="consultarReclamo">Consultar Reclamo</h2>
                         <br><br><br>
                         <label>Buscar por:</label>
                         <input type="radio" checked id="codigoradbtn" name="buscar"
@@ -88,11 +88,17 @@
 
 
                         <br><br>
-                        <button class="reclamo" id="btnbuscar"
-                            style="background-color: #ff9a9a;border: 1px solid #c07676;">Buscar</button>
+                        <button class="buttonRed" id="btnbuscar">Buscar</button>
                     </div>
                 </div>
-                <br>
+                <!--<br>
+                <div class="grid">
+                    <div id="tablaGrid" style="display: none"></div>
+                </div>-->
+            </div>
+            <div id="resultContainer" data-dojo-type="dijit/layout/ContentPane"
+                style="height: 100%;max-height: 400px;max-width: 1050px;width: 100%;"
+                data-dojo-props="title: 'Resultados'" id="resultados">
                 <div class="grid">
                     <div id="tablaGrid" style="display: none"></div>
                 </div>
@@ -130,6 +136,7 @@
     <script src="js/logUp.js"></script>
     <script src="js/app.js"></script>
     <script src="js/dialogs.js"></script>
+    <script src="js/submit.js"></script>
 
     <!-- Script para rellenar estados y tipos -->
     <script src="js/setOptions.js"></script>
@@ -227,8 +234,8 @@
                 id="cerrarCamposInv" class="buttonRed">Ok</button>
         </div>
     </div>
-    <!-- load jquery for gif of load -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <!-- load gif of load -->
+
     <script type="text/javascript">
         $(window).load(function () {
             $(".loader").fadeOut("slow");

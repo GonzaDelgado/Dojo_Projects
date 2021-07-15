@@ -1,0 +1,15 @@
+body {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    background-image: url("../images/background-pkmon.jpg");
+    background-repeat: repeat;
+}
+
+.jumbotron{
+    height: 40vh;
+    background-size: cover;
+}
+
+.jumbotron-detail-pokeapi{
+    background: url('../images/jumbotron-bg-pokemon4.jpg') no-repeat fixed ;
+}

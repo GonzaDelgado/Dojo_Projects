@@ -9,7 +9,7 @@ require(["dojo/dom", "dojo/on", "dojo/mouse", "dojo/request",
     function setOptions() {
         var deferred = new Deferred();
         let pokenombres = [];
-        return request.get(`https://pokeapi.co/api/v2/pokemon/?limit=-1`, {
+        return request.get('https://pokeapi.co/api/v2/pokemon/?limit=-1', {
             handleAs: "json"
         })
             .then(
